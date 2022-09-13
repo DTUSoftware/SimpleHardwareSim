@@ -1,19 +1,21 @@
 grammar hardware;
 
-// Parser:
+//Parser
 start   : '.hardware' IDENTIFIER 
 	'.inputs' IDENTIFIER+ 
 	'.outputs' IDENTIFIER+ 
 	'.latch' IDENTIFIER '->' IDENTIFIER
-	'.update' IDENTIFIER '='    
+	'.update' IDENTIFIER '=' bool
+	'.simulate' IDENTIFIER '=' ('0'|'1')+    
 	EOF
 	;
 
-// Lexer:
+//Variable
+bool : '!'? IDENTIFIER '&&' '!'? IDENTIFIER ;
+
+//Lexer
 IDENTIFIER : [a-zA-Z_]+ ;
 
+HVIDRUM : [ \t\n]+ -> skip ;
 KOMMENTAR : '//' ~[\n]* -> skip ;
-
-FLKOMMENTAR : '/*' ((~[*]) | ('*'~[/]))*  '*/' -> skip;
-
-WHITESPACE : [ \t\n]+ -> skip ;
+MULTILINECOMMENTS :  '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip; 
