@@ -1,9 +1,16 @@
 grammar hardware;
 
 // Parser:
-start   : EOF ;
+start   : '.hardware' IDENTIFIER 
+	'.inputs' IDENTIFIER+ 
+	'.outputs' IDENTIFIER+ 
+	'.latch' IDENTIFIER '->' IDENTIFIER
+	'.update' IDENTIFIER '='    
+	EOF
+	;
 
 // Lexer:
+IDENTIFIER : [a-zA-Z_]+ ;
 
 KOMMENTAR : '//' ~[\n]* -> skip ;
 
