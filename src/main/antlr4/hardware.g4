@@ -4,22 +4,29 @@ grammar hardware;
 start   : '.hardware' IDENTIFIER 
 	'.inputs' IDENTIFIER+ 
 	'.outputs' IDENTIFIER+ 
-	('.latch' IDENTIFIER '->' IDENTIFIER)+
-	'.update' (IDENTIFIER '=' updateIdentifiers)+
+	latchDecl+
+	'.update' updateDecl+
 	'.simulate' IDENTIFIER '=' ('0'|'1')+    
 	EOF
 	;
 
 //Variable
-updateIdentifiers: '(' updateIdentifiers ')'
-		| '!'? IDENTIFIER
-		| updateIdentifiers '&&' updateIdentifiers
-		| updateIdentifiers '||' updateIdentifiers
+latchDecl 	: '.latch' IDENTIFIER '->' IDENTIFIER ;
+
+updateDecl : IDENTIFIER '=' expr ;
+
+expr	: '(' expr ')'
+		| '!' expr
+		| expr '&&' expr
+		| expr '||' expr
+		| IDENTIFIER
 		;
 
 //Lexer
-IDENTIFIER : [a-zA-Z_]+ ;
+//IDENTIFIER : [A-Z] [a-zA-Z0-9_]* ;
+IDENTIFIER : [a-zA-Z]+ ;
 
-HVIDRUM : [ \t\n]+ -> skip ;
-KOMMENTAR : '//' ~[\n]* -> skip ;
+
+WHITESPACE: [ \t\n]+ -> skip ;
+COMMENT: '//' ~[\n]* -> skip ;
 MULTILINECOMMENTS :  '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip; 
