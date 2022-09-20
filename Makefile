@@ -15,5 +15,5 @@ hardwareLexer.java:	$(SOURCEDIR)/antlr4/hardware.g4
 hardwareLexer.class:	hardwareLexer.java
 	javac -d $(TARGETDIR) $(GENERATED)
 
-grun:	hardwareLexer.class $(SOURCEDIR)/resources/01-hello-world.hw
-	cd $(TARGETDIR) && $(grun) hardware start -gui -tokens ../../../$(SOURCEDIR)/resources/01-hello-world.hw
+grun:	hardwareLexer.class $(SOURCEDIR)/resources/03-trafiklys.hw
+	cd $(TARGETDIR) && $(grun) hardware start -gui -tokens ../../../$(SOURCEDIR)/resources/03-trafiklys.hw
