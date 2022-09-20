@@ -1,30 +1,34 @@
 grammar hardware;
 
 //Parser
-start   : '.hardware' IDENTIFIER 
-	'.inputs' IDENTIFIER+ 
-	'.outputs' IDENTIFIER+ 
-	latchDecl+
-	'.update' updateDecl+
-	'.simulate' IDENTIFIER '=' ('0'|'1')+    
+start   : '.hardware' hardware=IDENTIFIER
+	'.inputs' inputs=IDENTIFIER+
+	'.outputs' outputs=IDENTIFIER+
+	latches=latchDecl+
+	'.update' updates=updateDecl+
+	'.simulate' simulate=simInp
 	EOF
 	;
 
-//Variable
-latchDecl 	: '.latch' IDENTIFIER '->' IDENTIFIER ;
+//Variables
+latchDecl 	: '.latch' id=IDENTIFIER '->' latch=IDENTIFIER #Latch ;
 
-updateDecl : IDENTIFIER '=' expr ;
+updateDecl : id=IDENTIFIER '=' expr #Update ;
 
-expr	: '(' expr ')'
-		| '!' expr
-		| expr '&&' expr
-		| expr '||' expr
-		| IDENTIFIER
+expr	: '(' e=expr ')'      #Paramtheses
+		| '!' e=expr          #Negation
+		| e1=expr '&&' e2=expr    #And
+		| e1=expr '||' e2=expr    #Or
+		| id=IDENTIFIER        #Identifier
 		;
+
+simInp : id=IDENTIFIER '=' binary=BINARY #Simulate;
 
 //Lexer
 //IDENTIFIER : [A-Z] [a-zA-Z0-9_]* ;
 IDENTIFIER : [a-zA-Z]+ ;
+
+BINARY : ('0'|'1')+ ;
 
 
 WHITESPACE: [ \t\n]+ -> skip ;
