@@ -51,7 +51,7 @@ public class main {
 class Interpreter extends AbstractParseTreeVisitor<Expr> hardwareements hardwareVisitor<Expr> {
 
     public Expr visitStart(hardwareParser.StartContext ctx) {
-        return visit(ctx.e1);
+        return visit(ctx.e);
     }
 
     public Expr visitMultiplication(hardwareParser.MultiplicationContext ctx) {
