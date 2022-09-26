@@ -25,7 +25,7 @@ class Parantheses extends Expr {
 
 class Negation extends Expr {
     Expr e;
-    Parantheses(Expr e) { this.e = e; }
+    Negation(Expr e) { this.e = e; }
 
     public Boolean eval() {
         return (!(e.eval()));
@@ -34,7 +34,7 @@ class Negation extends Expr {
 
 class And extends Expr {
     Expr e1, e2;
-    Parantheses(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    And(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
 
     public Boolean eval() {
         return e1.eval() && e2.eval();
@@ -43,7 +43,7 @@ class And extends Expr {
 
 class Or extends Expr {
     Expr e1, e2;
-    Parantheses(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    Or(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
 
     public Boolean eval() {
         return e1.eval() || e2.eval();
@@ -65,4 +65,11 @@ class Identifier extends Expr {
         }
         return value;
     }
+}
+
+class Trace extends AST {
+    public String name;
+    public Boolean[] signal;
+
+    public Trace(String name, Boolean[] signal) {this.name = name; this.signal = signal;}
 }

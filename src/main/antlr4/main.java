@@ -48,7 +48,55 @@ public class main {
 // This is parameterized over a return type "<T>" which is in our case
 // shardwarey a Integer.
 
-class Interpreter extends AbstractParseTreeVisitor<Expr> hardwareements hardwareVisitor<Expr> {
+class Interpreter extends AbstractParseTreeVisitor<Expr> implements hardwareVisitor<Expr> {
+
+    @Override
+    public Expr visitStart(hardwareParser.StartContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitLatch(hardwareParser.LatchContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitUpdate(hardwareParser.UpdateContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitIdentifier(hardwareParser.IdentifierContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitOr(hardwareParser.OrContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitNegation(hardwareParser.NegationContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitAnd(hardwareParser.AndContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitParentheses(hardwareParser.ParenthesesContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Expr visitSimulation(hardwareParser.SimulationContext ctx) {
+        return null;
+    }
+
+    /*
+    // From lecture 4.
 
     public Expr visitStart(hardwareParser.StartContext ctx) {
         return visit(ctx.e);
@@ -79,5 +127,6 @@ class Interpreter extends AbstractParseTreeVisitor<Expr> hardwareements hardware
     public Expr visitParentheses(hardwareParser.ParenthesesContext ctx) {
         return visit(ctx.e1);
     }
+    */
 }
 
