@@ -38,8 +38,9 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        Expr result = (Expr) interpreter.visit(parseTree);
-        System.out.println("The result is: " + result.eval());
+        Command result=(Command)interpreter.visit(parseTree);
+        //System.out.println("The result is: "+
+        result.eval(new Environment());
     }
 }
 
@@ -52,23 +53,56 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        /*
-        //Todo
-        for (hardwareParser.IdentifierContext t: ctx) {
+        return visit(ctx.cs);
+    }
 
-        }
-        return new Start(ctx.hardware.getText(),ctx.inputs,ctx.outputs,ctx.latches,(Update) visit(ctx.updates),(Simulation) visit(ctx.simulate));
-        */
+    @Override
+    public AST visitSequence(hardwareParser.SequenceContext ctx) {
+        return new Sequence((Command)visit(ctx.c),(Command)visit(ctx.cs));
+    }
+
+    @Override
+    public AST visitNOP(hardwareParser.NOPContext ctx) {
+        return new NOP();
+    }
+
+    @Override
+    public AST visitHardware(hardwareParser.HardwareContext ctx) {
         return null;
     }
 
     @Override
-    public AST visitLatch(hardwareParser.LatchContext ctx) {
+    public AST visitInputs(hardwareParser.InputsContext ctx) {
+        return null;
+    }
+
+    @Override
+    public AST visitOutputs(hardwareParser.OutputsContext ctx) {
+        return null;
+    }
+
+    @Override
+    public AST visitLatches(hardwareParser.LatchesContext ctx) {
         return null;
     }
 
     @Override
     public AST visitUpdate(hardwareParser.UpdateContext ctx) {
+        return null;
+    }
+
+    @Override
+    public AST visitSimulate(hardwareParser.SimulateContext ctx) {
+        return null;
+    }
+
+    @Override
+    public AST visitLatchDeclaration(hardwareParser.LatchDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
+    public AST visitUpdateDeclaration(hardwareParser.UpdateDeclarationContext ctx) {
         return null;
     }
 

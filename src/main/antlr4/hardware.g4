@@ -2,20 +2,23 @@ grammar hardware;
 
 //==========[ Parser ]==========//
 
-start       :   '.hardware' hardware=IDENTIFIER
-                '.inputs'   inputs=IDENTIFIER+
-                '.outputs'  outputs=IDENTIFIER+
-                            latches=latchDecl+
-                '.update'   updates=updateDecl+
-                '.simulate' simulate=simInput
-                EOF
-            ;
+start : cs=commands EOF;
 
-// Variables
+      commands : c=command cs=commands   # Sequence
+      	 | 	   	      # NOP
+      	 ;
 
-latchDecl   :   '.latch' triggerID=IDENTIFIER '->' latchID=IDENTIFIER   # Latch ;
+      command : '.hardware' hardware=IDENTIFIER # Hardware
+      	| '.inputs'   inputs=IDENTIFIER+  # Inputs
+      	| '.outputs'  outputs=IDENTIFIER+  # Outputs
+      	| latches=latchDecl+ # Latches
+      	| '.update'   updates=updateDecl+ # Update
+      	| '.simulate' simulate=simInput # Simulate
+      	;
 
-updateDecl  :   id=IDENTIFIER '=' e=expr        # Update
+latchDecl   :   '.latch' triggerID=IDENTIFIER '->' latchID=IDENTIFIER   # LatchDeclaration ;
+
+updateDecl  :   id=IDENTIFIER '=' e=expr        # UpdateDeclaration
             ;
 
 expr	    :   '(' e=expr ')'                  # Parentheses
@@ -25,11 +28,11 @@ expr	    :   '(' e=expr ')'                  # Parentheses
             |   id=IDENTIFIER                   # Identifier
             ;
 
-simInput    :   id=IDENTIFIER '=' binary=BINARY # Simulation    ;
+simInput    :   id=IDENTIFIER '=' binary=BINARY # Simulation  ;
 
 //==========[ Lexer ]==========//
 
-//IDENTIFIER : [A-Z] [a-zA-Z0-9_]* ;
+//IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]*;
 IDENTIFIER  :   [a-zA-Z]+   ;
 
 BINARY      :   ('0'|'1')+  ;
