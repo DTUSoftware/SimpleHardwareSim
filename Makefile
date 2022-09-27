@@ -14,7 +14,7 @@ tree:
 	make grun
 
 main.class:	$(SRCFILES) $(GENERATED) $(SOURCEDIR)/antlr4/hardware.g4
-	javac  $(SRCFILES) $(GENERATED)
+	javac -d $(TARGETDIR) $(SRCFILES) $(GENERATED)
 
 hardwareLexer.java:	$(SOURCEDIR)/antlr4/hardware.g4
 	$(antlr4) -visitor $(SOURCEDIR)/antlr4/hardware.g4 -o $(TARGETDIR)
