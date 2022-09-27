@@ -38,7 +38,7 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        Expr result = interpreter.visit(parseTree);
+        AST result = interpreter.visit(parseTree);
         System.out.println("The result is: " + result.eval());
     }
 }
@@ -48,50 +48,55 @@ public class main {
 // This is parameterized over a return type "<T>" which is in our case
 // shardwarey a Integer.
 
-class Interpreter extends AbstractParseTreeVisitor<Expr> implements hardwareVisitor<Expr> {
+class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisitor<AST> {
 
     @Override
-    public Expr visitStart(hardwareParser.StartContext ctx) {
+    public AST visitStart(hardwareParser.StartContext ctx) {
+
+        for (hardwareParser.IdentifierContext t: ctx) {
+
+        }
+
+        return new Start(ctx.hardware.getText(),ctx.inputs,ctx.outputs,ctx.latches,(Update) visit(ctx.updates),(Simulation) visit(ctx.simulate));
+    }
+
+    @Override
+    public AST visitLatch(hardwareParser.LatchContext ctx) {
         return null;
     }
 
     @Override
-    public Expr visitLatch(hardwareParser.LatchContext ctx) {
+    public AST visitUpdate(hardwareParser.UpdateContext ctx) {
         return null;
     }
 
     @Override
-    public Expr visitUpdate(hardwareParser.UpdateContext ctx) {
-        return null;
-    }
-
-    @Override
-    public Expr visitIdentifier(hardwareParser.IdentifierContext ctx) {
+    public AST visitIdentifier(hardwareParser.IdentifierContext ctx) {
         return new Identifier(ctx.id.getText());
     }
 
     @Override
-    public Expr visitOr(hardwareParser.OrContext ctx) {
+    public AST visitOr(hardwareParser.OrContext ctx) {
         return new Or(visit(ctx.e1), visit(ctx.e2));
     }
 
     @Override
-    public Expr visitNegation(hardwareParser.NegationContext ctx) {
+    public AST visitNegation(hardwareParser.NegationContext ctx) {
         return new Negation(visit(ctx.e));
     }
 
     @Override
-    public Expr visitAnd(hardwareParser.AndContext ctx) {
+    public AST visitAnd(hardwareParser.AndContext ctx) {
         return new And(visit(ctx.e1), visit(ctx.e2));
     }
 
     @Override
-    public Expr visitParentheses(hardwareParser.ParenthesesContext ctx) {
+    public AST visitParentheses(hardwareParser.ParenthesesContext ctx) {
         return new Parantheses(visit(ctx.e));
     }
 
     @Override
-    public Expr visitSimulation(hardwareParser.SimulationContext ctx) {
+    public AST visitSimulation(hardwareParser.SimulationContext ctx) {
         return null;
     }
 

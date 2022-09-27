@@ -73,3 +73,37 @@ class Trace extends AST {
 
     public Trace(String name, Boolean[] signal) {this.name = name; this.signal = signal;}
 }
+
+class Start extends AST {
+    public String hardware;
+    public List<String> inputs;
+    public List<String> outputs;
+    public List<Latch> latches;
+    public List<Update> updates;
+    public Simulation simulate;
+    Start(String hardware,
+    List<String> inputs,
+    List<String> outputs,
+    List<Latch> latches,
+    List<Update> updates,
+    Simulation simulate) {
+        this.hardware = hardware;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.latches = latches;
+        this.updates = updates;
+        this.simulate = simulate;
+    }
+}
+
+class Latch extends AST {
+
+}
+
+class Update extends  AST {
+
+}
+
+class Simulation extends AST {
+
+}
