@@ -38,7 +38,7 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        AST result = interpreter.visit(parseTree);
+        Expr result = (Expr) interpreter.visit(parseTree);
         System.out.println("The result is: " + result.eval());
     }
 }
@@ -52,12 +52,14 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-
+        /*
+        //Todo
         for (hardwareParser.IdentifierContext t: ctx) {
 
         }
-
         return new Start(ctx.hardware.getText(),ctx.inputs,ctx.outputs,ctx.latches,(Update) visit(ctx.updates),(Simulation) visit(ctx.simulate));
+        */
+        return null;
     }
 
     @Override
@@ -77,22 +79,22 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitOr(hardwareParser.OrContext ctx) {
-        return new Or(visit(ctx.e1), visit(ctx.e2));
+        return new Or((Expr)visit(ctx.e1), (Expr)visit(ctx.e2));
     }
 
     @Override
     public AST visitNegation(hardwareParser.NegationContext ctx) {
-        return new Negation(visit(ctx.e));
+        return new Negation((Expr)visit(ctx.e));
     }
 
     @Override
     public AST visitAnd(hardwareParser.AndContext ctx) {
-        return new And(visit(ctx.e1), visit(ctx.e2));
+        return new And((Expr)visit(ctx.e1), (Expr)visit(ctx.e2));
     }
 
     @Override
     public AST visitParentheses(hardwareParser.ParenthesesContext ctx) {
-        return new Parantheses(visit(ctx.e));
+        return new Parantheses((Parantheses)visit(ctx.e));
     }
 
     @Override
