@@ -1,10 +1,3 @@
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.CharStreams;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AST {
@@ -25,6 +18,60 @@ class Sequence extends Command{
 
 class NOP extends Command{
     public void eval(Environment env){};
+}
+
+class Hardware extends Command {
+    String name;
+    Hardware(String name) {this.name=name;}
+    public void eval(Environment env) {}
+}
+
+class Inputs extends Command {
+    List<String> inputs;
+    Inputs(List<String>  inputs){this.inputs=inputs;}
+    public void eval(Environment env) {}
+}
+
+class Outputs extends Command {
+    List<String> outputs;
+    Outputs(List<String>  outputs){this.outputs=outputs;}
+    public void eval(Environment env) {}
+}
+
+class Latches extends Command {
+    List<LatchDeclaration> latches;
+    Latches(List<LatchDeclaration> latches) {this.latches=latches;}
+    public void eval(Environment env) {}
+}
+
+class LatchDeclaration extends AST {
+    String triggerId;
+    String latchId;
+    public LatchDeclaration(String triggerId, String latchId) {this.triggerId=triggerId; this.latchId=latchId;}
+}
+
+class Updates extends Command {
+    List<UpdateDeclaration> updates;
+    Updates(List<UpdateDeclaration> updates) {this.updates=updates;}
+    public void eval(Environment env) {}
+}
+
+class UpdateDeclaration extends AST {
+    String id;
+    Expr e;
+    public UpdateDeclaration(String id, Expr e) {this.id=id; this.e=e;}
+}
+
+class Simulate extends Command {
+    Simulation simulation;
+    Simulate(Simulation simulation){this.simulation=simulation;}
+    public void eval(Environment env) {}
+}
+
+class Simulation extends AST {
+    String id;
+    String binary;
+    public Simulation(String id, String binary) {this.id=id; this.binary=binary;}
 }
 
 abstract class Expr extends AST {
@@ -68,8 +115,8 @@ class Or extends Expr {
 }
 
 class Identifier extends Expr {
-    public String id;
-    public Boolean value = null;
+    String id;
+    Boolean value = null;
 
     Identifier(String id) {
         this.id = id;
@@ -85,42 +132,8 @@ class Identifier extends Expr {
 }
 
 class Trace extends AST {
-    public String name;
-    public Boolean[] signal;
+    String name;
+    Boolean[] signal;
 
     public Trace(String name, Boolean[] signal) {this.name = name; this.signal = signal;}
-}
-
-class Start extends AST {
-    public String hardware;
-    public List<String> inputs;
-    public List<String> outputs;
-    public List<Latch> latches;
-    public List<Update> updates;
-    public Simulation simulate;
-    Start(String hardware,
-    List<String> inputs,
-    List<String> outputs,
-    List<Latch> latches,
-    List<Update> updates,
-    Simulation simulate) {
-        this.hardware = hardware;
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.latches = latches;
-        this.updates = updates;
-        this.simulate = simulate;
-    }
-}
-
-class Latch extends AST {
-
-}
-
-class Update extends  AST {
-
-}
-
-class Simulation extends AST {
-
 }

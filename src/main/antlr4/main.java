@@ -1,4 +1,3 @@
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.CharStreams;
@@ -68,42 +67,66 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitHardware(hardwareParser.HardwareContext ctx) {
-        return null;
+        return new Hardware(ctx.hardware.getText());
     }
 
     @Override
     public AST visitInputs(hardwareParser.InputsContext ctx) {
-        return null;
+        List<String> inputs = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNode) {
+                inputs.add(ctx.getChild(i).getText());
+            }
+        }
+        return new Inputs(inputs);
     }
 
     @Override
     public AST visitOutputs(hardwareParser.OutputsContext ctx) {
-        return null;
+        List<String> outputs = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNode) {
+                outputs.add(ctx.getChild(i).getText());
+            }
+        }
+        return new Outputs(outputs);
     }
 
     @Override
     public AST visitLatches(hardwareParser.LatchesContext ctx) {
-        return null;
+        List<LatchDeclaration> latches = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNode) {
+                latches.add((LatchDeclaration) visit(ctx.getChild(i)));
+            }
+        }
+        return new Latches(latches);
     }
 
     @Override
     public AST visitUpdate(hardwareParser.UpdateContext ctx) {
-        return null;
+        List<UpdateDeclaration> updates = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNode) {
+                updates.add((UpdateDeclaration) visit(ctx.getChild(i)));
+            }
+        }
+        return new Updates(updates);
     }
 
     @Override
     public AST visitSimulate(hardwareParser.SimulateContext ctx) {
-        return null;
+        return new Simulate((Simulation) visit(ctx.simulate));
     }
 
     @Override
     public AST visitLatchDeclaration(hardwareParser.LatchDeclarationContext ctx) {
-        return null;
+        return new LatchDeclaration(ctx.triggerID.getText(),ctx.latchID.getText());
     }
 
     @Override
     public AST visitUpdateDeclaration(hardwareParser.UpdateDeclarationContext ctx) {
-        return null;
+        return new UpdateDeclaration(ctx.id.getText(),(Expr) visit(ctx.e));
     }
 
     @Override
@@ -133,41 +156,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitSimulation(hardwareParser.SimulationContext ctx) {
-        return null;
+        return new Simulation(ctx.id.getText(), ctx.binary.getText());
     }
-
-    /*
-    // From lecture 4.
-
-    public Expr visitStart(hardwareParser.StartContext ctx) {
-        return visit(ctx.e);
-    }
-
-    public Expr visitMultiplication(hardwareParser.MultiplicationContext ctx) {
-        if (ctx.op.getText().equals("*"))
-            return new Multiplication(visit(ctx.e1), visit(ctx.e2));
-        else
-            return new Division(visit(ctx.e1), visit(ctx.e2));
-    }
-
-    public Expr visitAddition(hardwareParser.AdditionContext ctx) {
-        if (ctx.op.getText().equals("+"))
-            return new Addition(visit(ctx.e1), visit(ctx.e2));
-        else
-            return new Subtraction(visit(ctx.e1), visit(ctx.e2));
-    }
-
-    public Expr visitVariable(hardwareParser.VariableContext ctx) {
-        return new Variable(ctx.x.getText());
-    }
-
-    public Expr visitConstant(hardwareParser.ConstantContext ctx) {
-        return new Constant(Integer.parseInt(ctx.c.getText()));
-    }
-
-    public Expr visitParentheses(hardwareParser.ParenthesesContext ctx) {
-        return visit(ctx.e1);
-    }
-    */
 }
-
