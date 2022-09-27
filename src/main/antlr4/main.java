@@ -67,27 +67,27 @@ class Interpreter extends AbstractParseTreeVisitor<Expr> implements hardwareVisi
 
     @Override
     public Expr visitIdentifier(hardwareParser.IdentifierContext ctx) {
-        return null;
+        return new Identifier(ctx.id.getText());
     }
 
     @Override
     public Expr visitOr(hardwareParser.OrContext ctx) {
-        return null;
+        return new Or(visit(ctx.e1), visit(ctx.e2));
     }
 
     @Override
     public Expr visitNegation(hardwareParser.NegationContext ctx) {
-        return null;
+        return new Negation(visit(ctx.e));
     }
 
     @Override
     public Expr visitAnd(hardwareParser.AndContext ctx) {
-        return null;
+        return new And(visit(ctx.e1), visit(ctx.e2));
     }
 
     @Override
     public Expr visitParentheses(hardwareParser.ParenthesesContext ctx) {
-        return null;
+        return new Parantheses(visit(ctx.e));
     }
 
     @Override
