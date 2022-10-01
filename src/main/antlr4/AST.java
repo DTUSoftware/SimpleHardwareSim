@@ -1,58 +1,184 @@
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.CharStreams;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AST {
-};
+}
+
+abstract class Element extends AST {
+    abstract public void eval(Environment env);
+}
+
+class Sequence extends Element {
+    Element e1, e2;
+
+    Sequence(Element e1, Element e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+
+    public void eval(Environment env) {
+        e1.eval(env);
+        e2.eval(env);
+    }
+}
+
+class NOP extends Element {
+    public void eval(Environment env) {
+    }
+}
+
+class Hardware extends Element {
+    String name;
+
+    Hardware(String name) {
+        this.name = name;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class Inputs extends Element {
+    List<String> inputs;
+
+    Inputs(List<String> inputs) {
+        this.inputs = inputs;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class Outputs extends Element {
+    List<String> outputs;
+
+    Outputs(List<String> outputs) {
+        this.outputs = outputs;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class Latches extends Element {
+    List<LatchDeclaration> latches;
+
+    Latches(List<LatchDeclaration> latches) {
+        this.latches = latches;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class LatchDeclaration extends AST {
+    String triggerId;
+    String latchId;
+
+    public LatchDeclaration(String triggerId, String latchId) {
+        this.triggerId = triggerId;
+        this.latchId = latchId;
+    }
+}
+
+class Updates extends Element {
+    List<UpdateDeclaration> updates;
+
+    Updates(List<UpdateDeclaration> updates) {
+        this.updates = updates;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class UpdateDeclaration extends AST {
+    String id;
+    Expr expr;
+
+    public UpdateDeclaration(String id, Expr expr) {
+        this.id = id;
+        this.expr = expr;
+    }
+}
+
+class Simulate extends Element {
+    Simulation simulation;
+
+    Simulate(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    public void eval(Environment env) {
+    }
+}
+
+class Simulation extends AST {
+    String id;
+    String binary;
+
+    public Simulation(String id, String binary) {
+        this.id = id;
+        this.binary = binary;
+    }
+}
 
 abstract class Expr extends AST {
     abstract public Boolean eval();
 }
 
-class Parantheses extends Expr {
-    Expr e;
-    Parantheses(Expr e) { this.e = e; }
+class Parentheses extends Expr {
+    Expr expr;
+
+    Parentheses(Expr expr) {
+        this.expr = expr;
+    }
 
     public Boolean eval() {
-        return e.eval();
+        return expr.eval();
     }
 }
 
 class Negation extends Expr {
-    Expr e;
-    Negation(Expr e) { this.e = e; }
+    Expr expr;
+
+    Negation(Expr expr) {
+        this.expr = expr;
+    }
 
     public Boolean eval() {
-        return (!(e.eval()));
+        return (!(expr.eval()));
     }
 }
 
 class And extends Expr {
-    Expr e1, e2;
-    And(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    Expr expr1, expr2;
+
+    And(Expr expr1, Expr expr2) {
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    }
 
     public Boolean eval() {
-        return e1.eval() && e2.eval();
+        return expr1.eval() && expr2.eval();
     }
 }
 
 class Or extends Expr {
-    Expr e1, e2;
-    Or(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    Expr expr1, expr2;
+
+    Or(Expr expr1, Expr expr2) {
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    }
 
     public Boolean eval() {
-        return e1.eval() || e2.eval();
+        return expr1.eval() || expr2.eval();
     }
 }
 
 class Identifier extends Expr {
-    public String id;
-    public Boolean value = null;
+    String id;
+    Boolean value = null;
 
     Identifier(String id) {
         this.id = id;
@@ -68,42 +194,11 @@ class Identifier extends Expr {
 }
 
 class Trace extends AST {
-    public String name;
-    public Boolean[] signal;
+    String name;
+    Boolean[] signal;
 
-    public Trace(String name, Boolean[] signal) {this.name = name; this.signal = signal;}
-}
-
-class Start extends AST {
-    public String hardware;
-    public List<String> inputs;
-    public List<String> outputs;
-    public List<Latch> latches;
-    public List<Update> updates;
-    public Simulation simulate;
-    Start(String hardware,
-    List<String> inputs,
-    List<String> outputs,
-    List<Latch> latches,
-    List<Update> updates,
-    Simulation simulate) {
-        this.hardware = hardware;
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.latches = latches;
-        this.updates = updates;
-        this.simulate = simulate;
+    public Trace(String name, Boolean[] signal) {
+        this.name = name;
+        this.signal = signal;
     }
-}
-
-class Latch extends AST {
-
-}
-
-class Update extends  AST {
-
-}
-
-class Simulation extends AST {
-
 }
