@@ -151,7 +151,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitParentheses(hardwareParser.ParenthesesContext ctx) {
-        return new Parenthesis((Parenthesis) visit(ctx.exp));
+        return new Parentheses((Expr) visit(ctx.exp));
     }
 
     @Override

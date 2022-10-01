@@ -126,10 +126,10 @@ abstract class Expr extends AST {
     abstract public Boolean eval();
 }
 
-class Parenthesis extends Expr {
+class Parentheses extends Expr {
     Expr expr;
 
-    Parenthesis(Expr expr) {
+    Parentheses(Expr expr) {
         this.expr = expr;
     }
 
