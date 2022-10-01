@@ -21,7 +21,7 @@ public class main {
 
         // open the input file
         CharStream input = CharStreams.fromFileName(filename);
-        //new ANTLRFileStream (filename); // depricated
+        //new ANTLRFileStream (filename); // deprecated
 
         // create a lexer/scanner
         hardwareLexer lex = new hardwareLexer(input);
@@ -37,7 +37,7 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        Command result=(Command)interpreter.visit(parseTree);
+        Element result = (Element) interpreter.visit(parseTree);
         //System.out.println("The result is: "+
         result.eval(new Environment());
     }
@@ -52,12 +52,12 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        return visit(ctx.cs);
+        return visit(ctx.seq);
     }
 
     @Override
-    public AST visitSequence(hardwareParser.SequenceContext ctx) {
-        return new Sequence((Command)visit(ctx.c),(Command)visit(ctx.cs));
+    public AST visitElementSequence(hardwareParser.ElementSequenceContext ctx) {
+        return new Sequence((Element) visit(ctx.e), (Element) visit(ctx.seq));
     }
 
     @Override
@@ -121,12 +121,12 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitLatchDeclaration(hardwareParser.LatchDeclarationContext ctx) {
-        return new LatchDeclaration(ctx.triggerID.getText(),ctx.latchID.getText());
+        return new LatchDeclaration(ctx.triggerID.getText(), ctx.latchID.getText());
     }
 
     @Override
     public AST visitUpdateDeclaration(hardwareParser.UpdateDeclarationContext ctx) {
-        return new UpdateDeclaration(ctx.id.getText(),(Expr) visit(ctx.e));
+        return new UpdateDeclaration(ctx.id.getText(), (Expr) visit(ctx.exp));
     }
 
     @Override
@@ -136,22 +136,22 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitOr(hardwareParser.OrContext ctx) {
-        return new Or((Expr)visit(ctx.e1), (Expr)visit(ctx.e2));
+        return new Or((Expr) visit(ctx.exp1), (Expr) visit(ctx.exp2));
     }
 
     @Override
     public AST visitNegation(hardwareParser.NegationContext ctx) {
-        return new Negation((Expr)visit(ctx.e));
+        return new Negation((Expr) visit(ctx.exp));
     }
 
     @Override
     public AST visitAnd(hardwareParser.AndContext ctx) {
-        return new And((Expr)visit(ctx.e1), (Expr)visit(ctx.e2));
+        return new And((Expr) visit(ctx.exp1), (Expr) visit(ctx.exp2));
     }
 
     @Override
     public AST visitParentheses(hardwareParser.ParenthesesContext ctx) {
-        return new Parantheses((Parantheses)visit(ctx.e));
+        return new Parentheses((Expr) visit(ctx.exp));
     }
 
     @Override

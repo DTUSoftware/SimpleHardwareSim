@@ -3,114 +3,176 @@ import java.util.List;
 public abstract class AST {
 }
 
-abstract class Command extends AST {
+abstract class Element extends AST {
     abstract public void eval(Environment env);
 }
 
-class Sequence extends Command{
-    Command c1,c2;
-    Sequence(Command c1,Command c2){this.c1=c1; this.c2=c2;}
-    public void eval(Environment env){
-        c1.eval(env);
-        c2.eval(env);
+class Sequence extends Element {
+    Element e1, e2;
+
+    Sequence(Element e1, Element e2) {
+        this.e1 = e1;
+        this.e2 = e2;
+    }
+
+    public void eval(Environment env) {
+        e1.eval(env);
+        e2.eval(env);
     }
 }
 
-class NOP extends Command{
-    public void eval(Environment env){};
+class NOP extends Element {
+    public void eval(Environment env) {
+    }
 }
 
-class Hardware extends Command {
+class Hardware extends Element {
     String name;
-    Hardware(String name) {this.name=name;}
-    public void eval(Environment env) {}
+
+    Hardware(String name) {
+        this.name = name;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
-class Inputs extends Command {
+class Inputs extends Element {
     List<String> inputs;
-    Inputs(List<String>  inputs){this.inputs=inputs;}
-    public void eval(Environment env) {}
+
+    Inputs(List<String> inputs) {
+        this.inputs = inputs;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
-class Outputs extends Command {
+class Outputs extends Element {
     List<String> outputs;
-    Outputs(List<String>  outputs){this.outputs=outputs;}
-    public void eval(Environment env) {}
+
+    Outputs(List<String> outputs) {
+        this.outputs = outputs;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
-class Latches extends Command {
+class Latches extends Element {
     List<LatchDeclaration> latches;
-    Latches(List<LatchDeclaration> latches) {this.latches=latches;}
-    public void eval(Environment env) {}
+
+    Latches(List<LatchDeclaration> latches) {
+        this.latches = latches;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
 class LatchDeclaration extends AST {
     String triggerId;
     String latchId;
-    public LatchDeclaration(String triggerId, String latchId) {this.triggerId=triggerId; this.latchId=latchId;}
+
+    public LatchDeclaration(String triggerId, String latchId) {
+        this.triggerId = triggerId;
+        this.latchId = latchId;
+    }
 }
 
-class Updates extends Command {
+class Updates extends Element {
     List<UpdateDeclaration> updates;
-    Updates(List<UpdateDeclaration> updates) {this.updates=updates;}
-    public void eval(Environment env) {}
+
+    Updates(List<UpdateDeclaration> updates) {
+        this.updates = updates;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
 class UpdateDeclaration extends AST {
     String id;
-    Expr e;
-    public UpdateDeclaration(String id, Expr e) {this.id=id; this.e=e;}
+    Expr expr;
+
+    public UpdateDeclaration(String id, Expr expr) {
+        this.id = id;
+        this.expr = expr;
+    }
 }
 
-class Simulate extends Command {
+class Simulate extends Element {
     Simulation simulation;
-    Simulate(Simulation simulation){this.simulation=simulation;}
-    public void eval(Environment env) {}
+
+    Simulate(Simulation simulation) {
+        this.simulation = simulation;
+    }
+
+    public void eval(Environment env) {
+    }
 }
 
 class Simulation extends AST {
     String id;
     String binary;
-    public Simulation(String id, String binary) {this.id=id; this.binary=binary;}
+
+    public Simulation(String id, String binary) {
+        this.id = id;
+        this.binary = binary;
+    }
 }
 
 abstract class Expr extends AST {
     abstract public Boolean eval();
 }
 
-class Parantheses extends Expr {
-    Expr e;
-    Parantheses(Expr e) { this.e = e; }
+class Parentheses extends Expr {
+    Expr expr;
+
+    Parentheses(Expr expr) {
+        this.expr = expr;
+    }
 
     public Boolean eval() {
-        return e.eval();
+        return expr.eval();
     }
 }
 
 class Negation extends Expr {
-    Expr e;
-    Negation(Expr e) { this.e = e; }
+    Expr expr;
+
+    Negation(Expr expr) {
+        this.expr = expr;
+    }
 
     public Boolean eval() {
-        return (!(e.eval()));
+        return (!(expr.eval()));
     }
 }
 
 class And extends Expr {
-    Expr e1, e2;
-    And(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    Expr expr1, expr2;
+
+    And(Expr expr1, Expr expr2) {
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    }
 
     public Boolean eval() {
-        return e1.eval() && e2.eval();
+        return expr1.eval() && expr2.eval();
     }
 }
 
 class Or extends Expr {
-    Expr e1, e2;
-    Or(Expr e1, Expr e2) { this.e1 = e1; this.e2 = e2; }
+    Expr expr1, expr2;
+
+    Or(Expr expr1, Expr expr2) {
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    }
 
     public Boolean eval() {
-        return e1.eval() || e2.eval();
+        return expr1.eval() || expr2.eval();
     }
 }
 
@@ -135,5 +197,8 @@ class Trace extends AST {
     String name;
     Boolean[] signal;
 
-    public Trace(String name, Boolean[] signal) {this.name = name; this.signal = signal;}
+    public Trace(String name, Boolean[] signal) {
+        this.name = name;
+        this.signal = signal;
+    }
 }
