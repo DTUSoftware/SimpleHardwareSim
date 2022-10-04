@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class AST {
@@ -85,12 +86,13 @@ class LatchDeclaration extends AST {
 //
 //    }
 
-    public void initialize() {
 
+    public void initialize(Environment env) {
+        env.setVariable(triggerId,false);
     }
 
-    public void nextCycle() {
-
+    public void nextCycle(Environment env, Boolean inputSignal) {
+        env.setVariable(triggerId, inputSignal);
     }
 }
 
@@ -114,10 +116,9 @@ class UpdateDeclaration extends AST {
         this.expr = expr;
     }
 
-//    @Override
-//    public void eval(Environment env) {
-//        expr.eval(env);
-//    }
+    public void eval(Environment env) {
+        env.setVariable(id, expr.eval(env));
+    }
 }
 
 class Simulate extends AST {
@@ -226,8 +227,15 @@ class Trace extends AST {
         this.signal = signal;
     }
 
-//    @Override
-//    public void eval(Environment env) {
-//
-//    }
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        for (Boolean s: signal) {
+            if (s) {
+                output.append(1);
+            } else {
+                output.append(0);
+            }
+        }
+        return output + " " + name;
+    }
 }
