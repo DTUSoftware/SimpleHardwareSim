@@ -1,13 +1,31 @@
 import java.util.List;
 
 public abstract class AST {
-    abstract public void eval(Environment env);
+//    abstract public void eval(Environment env);
 }
 
 //class NOP extends Element {
 //    public void eval(Environment env) {
 //    }
 //}
+class Start extends AST {
+    Hardware hardware;
+    Inputs inputs;
+    Outputs outputs;
+    Latches latches;
+    Updates updates;
+    Simulate simulate;
+
+    Start(Hardware hardware, Inputs inputs, Outputs outputs, Latches latches, Updates updates, Simulate simulate) {
+        this.hardware = hardware;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.latches = latches;
+        this.updates = updates;
+        this.simulate = simulate;
+    }
+}
+
 
 class Hardware extends AST {
     String name;
@@ -16,8 +34,8 @@ class Hardware extends AST {
         this.name = name;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class Inputs extends AST {
@@ -27,8 +45,8 @@ class Inputs extends AST {
         this.inputs = inputs;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class Outputs extends AST {
@@ -38,8 +56,8 @@ class Outputs extends AST {
         this.outputs = outputs;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class Latches extends AST {
@@ -49,8 +67,8 @@ class Latches extends AST {
         this.latches = latches;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class LatchDeclaration extends AST {
@@ -62,8 +80,16 @@ class LatchDeclaration extends AST {
         this.latchId = latchId;
     }
 
-    @Override
-    public void eval(Environment env) {
+//    @Override
+//    public void eval(Environment env) {
+//
+//    }
+
+    public void initialize() {
+
+    }
+
+    public void nextCycle() {
 
     }
 }
@@ -75,8 +101,8 @@ class Updates extends AST {
         this.updates = updates;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class UpdateDeclaration extends AST {
@@ -88,10 +114,10 @@ class UpdateDeclaration extends AST {
         this.expr = expr;
     }
 
-    @Override
-    public void eval(Environment env) {
-
-    }
+//    @Override
+//    public void eval(Environment env) {
+//        expr.eval(env);
+//    }
 }
 
 class Simulate extends AST {
@@ -101,8 +127,8 @@ class Simulate extends AST {
         this.simulation = simulation;
     }
 
-    public void eval(Environment env) {
-    }
+//    public void eval(Environment env) {
+//    }
 }
 
 class Simulation extends AST {
@@ -114,19 +140,14 @@ class Simulation extends AST {
         this.binary = binary;
     }
 
-    @Override
-    public void eval(Environment env) {
-
-    }
+//    @Override
+//    public void eval(Environment env) {
+//
+//    }
 }
 
 abstract class Expr extends AST {
-    @Override
-    public void eval(Environment env) {
-        eval();
-    }
-
-    abstract public Boolean eval();
+    abstract public Boolean eval(Environment env);
 }
 
 class Parentheses extends Expr {
@@ -136,8 +157,8 @@ class Parentheses extends Expr {
         this.expr = expr;
     }
 
-    public Boolean eval() {
-        return expr.eval();
+    public Boolean eval(Environment env) {
+        return expr.eval(env);
     }
 }
 
@@ -148,8 +169,8 @@ class Negation extends Expr {
         this.expr = expr;
     }
 
-    public Boolean eval() {
-        return (!(expr.eval()));
+    public Boolean eval(Environment env) {
+        return (!(expr.eval(env)));
     }
 }
 
@@ -161,8 +182,8 @@ class And extends Expr {
         this.expr2 = expr2;
     }
 
-    public Boolean eval() {
-        return expr1.eval() && expr2.eval();
+    public Boolean eval(Environment env) {
+        return expr1.eval(env) && expr2.eval(env);
     }
 }
 
@@ -174,25 +195,25 @@ class Or extends Expr {
         this.expr2 = expr2;
     }
 
-    public Boolean eval() {
-        return expr1.eval() || expr2.eval();
+    public Boolean eval(Environment env) {
+        return expr1.eval(env) || expr2.eval(env);
     }
 }
 
 class Identifier extends Expr {
     String id;
-    Boolean value = null;
 
     Identifier(String id) {
         this.id = id;
     }
 
-    public Boolean eval() {
-        if (this.value == null) {
+    public Boolean eval(Environment env) {
+        if (env.getVariable(id) == null) {
             System.out.println("Identifier not initialized to value, assuming " + id + "=0");
-            return false;
+            env.setVariable(id, false); // set to false
+            return env.getVariable(id);
         }
-        return value;
+        return env.getVariable(id);
     }
 }
 
@@ -205,8 +226,8 @@ class Trace extends AST {
         this.signal = signal;
     }
 
-    @Override
-    public void eval(Environment env) {
-
-    }
+//    @Override
+//    public void eval(Environment env) {
+//
+//    }
 }

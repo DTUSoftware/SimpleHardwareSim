@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class main {
+    static Start ast;
+    static Environment env;
+
     public static void main(String[] args) throws IOException {
 
         // we expect exactly one argument: the name of the input file
@@ -37,9 +40,47 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        AST result = interpreter.visit(parseTree);
+        ast = (Start) interpreter.visit(parseTree);
         //System.out.println("The result is: "+
-        result.eval(new Environment());
+//        result.eval(new Environment());
+
+        env = new Environment();
+        runSimulator(ast.simulate.simulation.binary.length());
+    }
+
+    public static void initialize() {
+        for (String input : ast.inputs.inputs) {
+            env.setVariable(input, false);
+        }
+        for (String output : ast.outputs.outputs) {
+            env.setVariable(output, false);
+        }
+
+        for (LatchDeclaration latch : ast.latches.latches) {
+            env.setVariable(latch.latchId, env.getVariable(latch.triggerId));
+        }
+    }
+
+    public static void nextCycle(int i) {
+        // Input
+        env.setVariable(ast.inputs.inputs.get(0), ast.simulate.simulation.binary.charAt(i) == '1');
+
+        // Update latches
+        for (LatchDeclaration latch : ast.latches.latches) {
+            env.setVariable(latch.latchId, env.getVariable(latch.triggerId));
+        }
+
+        // Run updates
+        for (UpdateDeclaration update : ast.updates.updates) {
+            env.setVariable(update.id, update.expr.eval(env));
+        }
+    }
+
+    public static void runSimulator(int n) {
+        initialize();
+        for (int i = 0; i < n; i++) {
+            nextCycle(i);
+        }
     }
 }
 
@@ -52,21 +93,14 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        visitHardware(ctx.hardware);
-        visitInputs(ctx.inputs);
-        visitOutputs(ctx.outputs);
-        visitLatches(ctx.latches);
-        visitUpdate(ctx.updates);
-        Simulate sim = (Simulate) visitSimulate(ctx.simulate);
-
-        return sim;
+        return new Start(visitHardware(ctx.hardware), visitInputs(ctx.inputs), visitOutputs(ctx.outputs), visitLatches(ctx.latches), visitUpdate(ctx.updates), visitSimulate(ctx.simulate));
     }
 
-    public AST visitHardware(Token hardware) {
+    public Hardware visitHardware(Token hardware) {
         return new Hardware(hardware.getText());
     }
 
-    public AST visitInputs(List<Token> inputs) {
+    public Inputs visitInputs(List<Token> inputs) {
         List<String> inputStrings = new ArrayList<>();
         for (Token t: inputs) {
             inputStrings.add(t.getText());
@@ -74,7 +108,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
         return new Inputs(inputStrings);
     }
 
-    public AST visitOutputs(List<Token> outputs) {
+    public Outputs visitOutputs(List<Token> outputs) {
         List<String> outputStrings = new ArrayList<>();
         for (Token t: outputs) {
             outputStrings.add(t.getText());
@@ -82,7 +116,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
         return new Outputs(outputStrings);
     }
 
-    public AST visitLatches(List<hardwareParser.LatchDeclContext> latches) {
+    public Latches visitLatches(List<hardwareParser.LatchDeclContext> latches) {
         List<LatchDeclaration> latcheDecls = new ArrayList<>();
         for (hardwareParser.LatchDeclContext t: latches) {
             latcheDecls.add((LatchDeclaration) visit(t));
@@ -90,7 +124,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
         return new Latches(latcheDecls);
     }
 
-    public AST visitUpdate(List<hardwareParser.UpdateDeclContext> updates) {
+    public Updates visitUpdate(List<hardwareParser.UpdateDeclContext> updates) {
         List<UpdateDeclaration> updateDecls = new ArrayList<>();
         for (hardwareParser.UpdateDeclContext t: updates) {
             updateDecls.add((UpdateDeclaration) visit(t));
@@ -98,7 +132,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
         return new Updates(updateDecls);
     }
 
-    public AST visitSimulate(hardwareParser.SimInputContext simulate) {
+    public Simulate visitSimulate(hardwareParser.SimInputContext simulate) {
         return new Simulate((Simulation) visit(simulate));
     }
 
