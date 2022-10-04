@@ -3,7 +3,7 @@ TARGETDIR := target/generated-sources/antlr4
 
 antlr4 = java org.antlr.v4.Tool
 grun = java org.antlr.v4.gui.TestRig
-SRCFILES = $(SOURCEDIR)/antlr4/main.java $(SOURCEDIR)/antlr4/AST.java
+SRCFILES = $(SOURCEDIR)/antlr4/main.java $(SOURCEDIR)/antlr4/AST.java $(SOURCEDIR)/antlr4/Environment.java
 GENERATED = $(TARGETDIR)/hardwareListener.java $(TARGETDIR)/hardwareBaseListener.java $(TARGETDIR)/hardwareParser.java $(TARGETDIR)/hardwareLexer.java $(TARGETDIR)/hardwareBaseVisitor.java $(TARGETDIR)/hardwareVisitor.java
 INPUTFILE = $(SOURCEDIR)/resources/03-trafiklys.hw
 

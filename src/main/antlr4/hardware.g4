@@ -35,7 +35,7 @@ simInput    :   id=IDENTIFIER '=' binary=BINARY   # Simulation
 
 //==========[ Lexer ]==========//
 
-IDENTIFIER  :   [a-zA-Z-] [a-zA-Z0-9_]*
+IDENTIFIER  :   [a-zA-Z_] [a-zA-Z0-9_]*
             ;
 
 BINARY      :   ('0'|'1')+
