@@ -1,32 +1,15 @@
 import java.util.List;
 
 public abstract class AST {
-}
-
-abstract class Element extends AST {
     abstract public void eval(Environment env);
 }
 
-class Sequence extends Element {
-    Element e1, e2;
+//class NOP extends Element {
+//    public void eval(Environment env) {
+//    }
+//}
 
-    Sequence(Element e1, Element e2) {
-        this.e1 = e1;
-        this.e2 = e2;
-    }
-
-    public void eval(Environment env) {
-        e1.eval(env);
-        e2.eval(env);
-    }
-}
-
-class NOP extends Element {
-    public void eval(Environment env) {
-    }
-}
-
-class Hardware extends Element {
+class Hardware extends AST {
     String name;
 
     Hardware(String name) {
@@ -37,7 +20,7 @@ class Hardware extends Element {
     }
 }
 
-class Inputs extends Element {
+class Inputs extends AST {
     List<String> inputs;
 
     Inputs(List<String> inputs) {
@@ -48,7 +31,7 @@ class Inputs extends Element {
     }
 }
 
-class Outputs extends Element {
+class Outputs extends AST {
     List<String> outputs;
 
     Outputs(List<String> outputs) {
@@ -59,7 +42,7 @@ class Outputs extends Element {
     }
 }
 
-class Latches extends Element {
+class Latches extends AST {
     List<LatchDeclaration> latches;
 
     Latches(List<LatchDeclaration> latches) {
@@ -78,9 +61,14 @@ class LatchDeclaration extends AST {
         this.triggerId = triggerId;
         this.latchId = latchId;
     }
+
+    @Override
+    public void eval(Environment env) {
+
+    }
 }
 
-class Updates extends Element {
+class Updates extends AST {
     List<UpdateDeclaration> updates;
 
     Updates(List<UpdateDeclaration> updates) {
@@ -99,9 +87,14 @@ class UpdateDeclaration extends AST {
         this.id = id;
         this.expr = expr;
     }
+
+    @Override
+    public void eval(Environment env) {
+
+    }
 }
 
-class Simulate extends Element {
+class Simulate extends AST {
     Simulation simulation;
 
     Simulate(Simulation simulation) {
@@ -120,9 +113,19 @@ class Simulation extends AST {
         this.id = id;
         this.binary = binary;
     }
+
+    @Override
+    public void eval(Environment env) {
+
+    }
 }
 
 abstract class Expr extends AST {
+    @Override
+    public void eval(Environment env) {
+        eval();
+    }
+
     abstract public Boolean eval();
 }
 
@@ -200,5 +203,10 @@ class Trace extends AST {
     public Trace(String name, Boolean[] signal) {
         this.name = name;
         this.signal = signal;
+    }
+
+    @Override
+    public void eval(Environment env) {
+
     }
 }

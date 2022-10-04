@@ -37,7 +37,7 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        Element result = (Element) interpreter.visit(parseTree);
+        AST result = interpreter.visit(parseTree);
         //System.out.println("The result is: "+
         result.eval(new Environment());
     }
@@ -52,63 +52,54 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        return visit(ctx.seq);
+        visitHardware(ctx.hardware);
+        visitInputs(ctx.inputs);
+        visitOutputs(ctx.outputs);
+        visitLatches(ctx.latches);
+        visitUpdate(ctx.updates);
+        Simulate sim = (Simulate) visitSimulate(ctx.simulate);
+
+        return sim;
     }
 
-    @Override
-    public AST visitElementSequence(hardwareParser.ElementSequenceContext ctx) {
-        return new Sequence((Element) visit(ctx.e), (Element) visit(ctx.seq));
+    public AST visitHardware(Token hardware) {
+        return new Hardware(hardware.getText());
     }
 
-    @Override
-    public AST visitNOP(hardwareParser.NOPContext ctx) {
-        return new NOP();
-    }
-
-    @Override
-    public AST visitHardware(hardwareParser.HardwareContext ctx) {
-        return new Hardware(ctx.hardware.getText());
-    }
-
-    @Override
-    public AST visitInputs(hardwareParser.InputsContext ctx) {
-        List<String> inputs = new ArrayList<>();
-        for (Token t: ctx.inputs) {
-            inputs.add(t.getText());
+    public AST visitInputs(List<Token> inputs) {
+        List<String> inputStrings = new ArrayList<>();
+        for (Token t: inputs) {
+            inputStrings.add(t.getText());
         }
-        return new Inputs(inputs);
+        return new Inputs(inputStrings);
     }
 
-    @Override
-    public AST visitOutputs(hardwareParser.OutputsContext ctx) {
-        List<String> outputs = new ArrayList<>();
-        for (Token t: ctx.outputs) {
-            outputs.add(t.getText());
+    public AST visitOutputs(List<Token> outputs) {
+        List<String> outputStrings = new ArrayList<>();
+        for (Token t: outputs) {
+            outputStrings.add(t.getText());
         }
-        return new Outputs(outputs);
+        return new Outputs(outputStrings);
     }
 
-    @Override
-    public AST visitLatches(hardwareParser.LatchesContext ctx) {
-        List<LatchDeclaration> latches = new ArrayList<>();
-        for (hardwareParser.LatchDeclContext t: ctx.latches) {
-            latches.add((LatchDeclaration) visit(t));
+    public AST visitLatches(List<hardwareParser.LatchDeclContext> latches) {
+        List<LatchDeclaration> latcheDecls = new ArrayList<>();
+        for (hardwareParser.LatchDeclContext t: latches) {
+            latcheDecls.add((LatchDeclaration) visit(t));
         }
-        return new Latches(latches);
+        return new Latches(latcheDecls);
     }
 
-    @Override
-    public AST visitUpdate(hardwareParser.UpdateContext ctx) {
-        List<UpdateDeclaration> updates = new ArrayList<>();
-        for (hardwareParser.UpdateDeclContext t: ctx.updates) {
-            updates.add((UpdateDeclaration) visit(t));
+    public AST visitUpdate(List<hardwareParser.UpdateDeclContext> updates) {
+        List<UpdateDeclaration> updateDecls = new ArrayList<>();
+        for (hardwareParser.UpdateDeclContext t: updates) {
+            updateDecls.add((UpdateDeclaration) visit(t));
         }
-        return new Updates(updates);
+        return new Updates(updateDecls);
     }
 
-    @Override
-    public AST visitSimulate(hardwareParser.SimulateContext ctx) {
-        return new Simulate((Simulation) visit(ctx.simulate));
+    public AST visitSimulate(hardwareParser.SimInputContext simulate) {
+        return new Simulate((Simulation) visit(simulate));
     }
 
     @Override

@@ -2,19 +2,13 @@ grammar hardware;
 
 //==========[ Parser ]==========//
 
-start       :   seq=sequence EOF
-            ;
-
-sequence    :   e=element seq=sequence            # ElementSequence
-            | 	   	                              # NOP
-            ;
-
-element     :   '.hardware' hardware=IDENTIFIER   # Hardware
-            |   '.inputs'   inputs+=IDENTIFIER+    # Inputs
-            |   '.outputs'  outputs+=IDENTIFIER+   # Outputs
-            |   latches+=latchDecl+                # Latches
-            |   '.update'   updates+=updateDecl+   # Update
-            |   '.simulate' simulate=simInput     # Simulate
+start       :   '.hardware' hardware=IDENTIFIER
+                '.inputs'   inputs+=IDENTIFIER+
+                '.outputs'  outputs+=IDENTIFIER+
+                latches+=latchDecl+
+                '.update'   updates+=updateDecl+
+                '.simulate' simulate=simInput
+                EOF
             ;
 
 latchDecl   :   '.latch' triggerID=IDENTIFIER '->' latchID=IDENTIFIER   # LatchDeclaration
