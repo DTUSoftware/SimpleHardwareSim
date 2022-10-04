@@ -10,10 +10,10 @@ sequence    :   e=element seq=sequence            # ElementSequence
             ;
 
 element     :   '.hardware' hardware=IDENTIFIER   # Hardware
-            |   '.inputs'   inputs=IDENTIFIER+    # Inputs
-            |   '.outputs'  outputs=IDENTIFIER+   # Outputs
-            |   latches=latchDecl+                # Latches
-            |   '.update'   updates=updateDecl+   # Update
+            |   '.inputs'   inputs+=IDENTIFIER+    # Inputs
+            |   '.outputs'  outputs+=IDENTIFIER+   # Outputs
+            |   latches+=latchDecl+                # Latches
+            |   '.update'   updates+=updateDecl+   # Update
             |   '.simulate' simulate=simInput     # Simulate
             ;
 

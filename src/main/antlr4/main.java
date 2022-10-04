@@ -73,10 +73,8 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
     @Override
     public AST visitInputs(hardwareParser.InputsContext ctx) {
         List<String> inputs = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            if (ctx.getChild(i) instanceof TerminalNode) {
-                inputs.add(ctx.getChild(i).getText());
-            }
+        for (Token t: ctx.inputs) {
+            inputs.add(t.getText());
         }
         return new Inputs(inputs);
     }
@@ -84,10 +82,8 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
     @Override
     public AST visitOutputs(hardwareParser.OutputsContext ctx) {
         List<String> outputs = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            if (ctx.getChild(i) instanceof TerminalNode) {
-                outputs.add(ctx.getChild(i).getText());
-            }
+        for (Token t: ctx.outputs) {
+            outputs.add(t.getText());
         }
         return new Outputs(outputs);
     }
@@ -95,10 +91,8 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
     @Override
     public AST visitLatches(hardwareParser.LatchesContext ctx) {
         List<LatchDeclaration> latches = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            if (ctx.getChild(i) instanceof TerminalNode) {
-                latches.add((LatchDeclaration) visit(ctx.getChild(i)));
-            }
+        for (hardwareParser.LatchDeclContext t: ctx.latches) {
+            latches.add((LatchDeclaration) visit(t));
         }
         return new Latches(latches);
     }
@@ -106,10 +100,8 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
     @Override
     public AST visitUpdate(hardwareParser.UpdateContext ctx) {
         List<UpdateDeclaration> updates = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            if (ctx.getChild(i) instanceof TerminalNode) {
-                updates.add((UpdateDeclaration) visit(ctx.getChild(i)));
-            }
+        for (hardwareParser.UpdateDeclContext t: ctx.updates) {
+            updates.add((UpdateDeclaration) visit(t));
         }
         return new Updates(updates);
     }
