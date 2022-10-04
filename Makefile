@@ -17,7 +17,7 @@ main.class:	$(SRCFILES) $(GENERATED) $(SOURCEDIR)/antlr4/hardware.g4
 	javac -d $(TARGETDIR) $(SRCFILES) $(GENERATED)
 
 hardwareLexer.java:	$(SOURCEDIR)/antlr4/hardware.g4
-	$(antlr4) -visitor $(SOURCEDIR)/antlr4/hardware.g4 -o $(TARGETDIR)
+	cd $(SOURCEDIR)/antlr4 && $(antlr4) -visitor hardware.g4 -o ../../../$(TARGETDIR)
 
 hardwareLexer.class:	hardwareLexer.java
 	javac -d $(TARGETDIR) $(GENERATED)
