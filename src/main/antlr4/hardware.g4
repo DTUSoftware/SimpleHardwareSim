@@ -41,7 +41,7 @@ IDENTIFIER  :   [a-zA-Z_] [a-zA-Z0-9_]*
 BINARY      :   ('0'|'1')+
             ;
 
-WHITESPACE  :   [ \t\n]+ -> skip
+WHITESPACE  :   [ \t\n\r]+ -> skip
             ;
 
 COMMENT     :   '//' ~[\n]* -> skip
