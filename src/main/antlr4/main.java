@@ -45,9 +45,11 @@ public class main {
 //        result.eval(new Environment());
 
         env = new Environment();
-        runSimulator(ast.simulate.simulation.binary.length());
+        //runSimulator(ast.simulate.simulation.binary.length());
+        ast.eval(env);
     }
 
+    /*
     public static void initialize() {
         for (String input : ast.inputs.inputs) {
             env.setVariable(input, false);
@@ -82,6 +84,7 @@ public class main {
             nextCycle(i);
         }
     }
+     */
 }
 
 // We write an interpreter that implements interface
