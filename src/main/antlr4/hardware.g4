@@ -17,7 +17,7 @@ latchDecl   :   '.latch' triggerID=IDENTIFIER '->' latchID=IDENTIFIER   # LatchD
 updateDecl  :   id=IDENTIFIER '=' exp=expr        # UpdateDeclaration
             ;
 
-expr	    :   '(' exp=expr ')'                  # Parentheses
+expr        :   '(' exp=expr ')'                  # Parentheses
             |   '!' exp=expr                      # Negation
             |   exp1=expr ('&&'|'and') exp2=expr  # And
             |   exp1=expr ('||'|'or') exp2=expr   # Or
