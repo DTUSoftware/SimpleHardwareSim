@@ -1,15 +1,9 @@
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AST {
-//    abstract public void eval(Environment env);
-}
+public abstract class AST {}
 
-//class NOP extends Element {
-//    public void eval(Environment env) {
-//    }
-//}
-class Start extends AST {
+class Circuit extends AST {
     Hardware hardware;
     Inputs inputs;
     Outputs outputs;
@@ -17,7 +11,7 @@ class Start extends AST {
     Updates updates;
     Simulate simulate;
 
-    Start(Hardware hardware, Inputs inputs, Outputs outputs, Latches latches, Updates updates, Simulate simulate) {
+    Circuit(Hardware hardware, Inputs inputs, Outputs outputs, Latches latches, Updates updates, Simulate simulate) {
         this.hardware = hardware;
         this.inputs = inputs;
         this.outputs = outputs;
@@ -26,16 +20,25 @@ class Start extends AST {
         this.simulate = simulate;
     }
 
-    public void eval(Environment env) {
+    public void runSimulator(Environment env) {
+        int n = simulate.getSimulationLength();
         initialize(env);
-        for (int i = 0; i < simulate.simulation.binary.length(); i++) {
+        for (int i = 0; i < n; i++) {
             nextCycle(env, i);
+            if (i+1 < n) {
+                // Start next cycle in environment
+                env.nextCycle();
+            }
         }
+        printOutput(env);
     }
 
     public void initialize(Environment env) {
         inputs.eval(env);
         outputs.eval(env);
+        for (UpdateDeclaration update : updates.updates) {
+            env.setVariable(update.id, false);
+        }
         latches.eval(env);
     }
 
@@ -47,6 +50,16 @@ class Start extends AST {
         // Run updates
         updates.eval(env);
     }
+
+    public void printOutput(Environment env) {
+        ArrayList<String> variables = new ArrayList<>();
+        variables.addAll(inputs.inputs);
+        variables.addAll(outputs.outputs);
+        for (String variable : variables) {
+            Trace binaryTrace = new Trace(variable, env.getValues(variable));
+            System.out.println(binaryTrace + " " + variable);
+        }
+    }
 }
 
 
@@ -56,9 +69,6 @@ class Hardware extends AST {
     Hardware(String name) {
         this.name = name;
     }
-
-//    public void eval(Environment env) {
-//    }
 }
 
 class Inputs extends AST {
@@ -115,10 +125,6 @@ class LatchDeclaration extends AST {
     public void eval(Environment env) {
         env.setVariable(latchId, env.getVariable(triggerId));
     }
-
-    //public void initialize(Environment env) {env.setVariable(triggerId,false);}
-
-    //public void nextCycle(Environment env, Boolean inputSignal) {env.setVariable(triggerId, inputSignal);}
 }
 
 class Updates extends AST {
@@ -156,8 +162,9 @@ class Simulate extends AST {
         this.simulation = simulation;
     }
 
-//    public void eval(Environment env) {
-//    }
+    public int getSimulationLength() {
+        return simulation.binary.length();
+    }
 }
 
 class Simulation extends AST {
@@ -168,14 +175,10 @@ class Simulation extends AST {
         this.id = id;
         this.binary = binary;
     }
-
-//    @Override
-//    public void eval(Environment env) {
-//
-//    }
 }
 
 abstract class Expr extends AST {
+
     abstract public Boolean eval(Environment env);
 }
 
@@ -248,22 +251,18 @@ class Identifier extends Expr {
 
 class Trace extends AST {
     String name;
-    Boolean[] signal;
+    List<Boolean> signal;
 
-    public Trace(String name, Boolean[] signal) {
+    public Trace(String name, List<Boolean> signal) {
         this.name = name;
         this.signal = signal;
     }
 
     public String toString() {
-        StringBuilder output = new StringBuilder();
-        for (Boolean s: signal) {
-            if (s) {
-                output.append(1);
-            } else {
-                output.append(0);
-            }
+        StringBuilder binaryValues = new StringBuilder();
+        for (Boolean value : signal) {
+            binaryValues.append(value ? "1" : "0");
         }
-        return output + " " + name;
+        return binaryValues.toString();
     }
 }

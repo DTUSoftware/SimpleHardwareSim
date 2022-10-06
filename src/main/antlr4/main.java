@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class main {
-    static Start ast;
-    static Environment env;
+    //static Start ast;
+    //static Environment env;
 
     public static void main(String[] args) throws IOException {
 
@@ -40,71 +40,15 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        ast = (Start) interpreter.visit(parseTree);
+        Circuit ast = (Circuit) interpreter.visit(parseTree);
         //System.out.println("The result is: "+
 //        result.eval(new Environment());
 
-        env = new Environment();
+        Environment env = new Environment();
 
-        runSimulator(ast.simulate.simulation.binary.length());
-        printOutput();
-    }
-
-    public static void initialize() {
-        for (String input : ast.inputs.inputs) {
-            env.setVariable(input, false);
-        }
-        for (String output : ast.outputs.outputs) {
-            env.setVariable(output, false);
-        }
-        for (UpdateDeclaration update : ast.updates.updates) {
-            env.setVariable(update.id, false);
-        }
-        for (LatchDeclaration latch : ast.latches.latches) {
-            env.setVariable(latch.latchId, env.getVariable(latch.triggerId));
-        }
-    }
-
-    public static void nextCycle(int i) {
-        // Input
-        env.setVariable(ast.inputs.inputs.get(0), ast.simulate.simulation.binary.charAt(i) == '1');
-
-        // Update latches
-        for (LatchDeclaration latch : ast.latches.latches) {
-            env.setVariable(latch.latchId, env.getVariable(latch.triggerId));
-        }
-
-        // Run updates
-        for (UpdateDeclaration update : ast.updates.updates) {
-            env.setVariable(update.id, update.expr.eval(env));
-        }
-    }
-
-    public static void runSimulator(int n) {
-        initialize();
-        for (int i = 0; i < n; i++) {
-//            System.out.println("============== Running cycle: " + i + "/" + n + " ==============");
-            nextCycle(i);
-            if (i+1 < n) {
-                // Start next cycle in environment
-                env.nextCycle();
-            }
-        }
-    }
-
-    public static void printOutput() {
-        ArrayList<String> variables = new ArrayList<>();
-        variables.addAll(ast.inputs.inputs);
-        variables.addAll(ast.outputs.outputs);
-        for (String variable : variables) {
-            StringBuilder binaryValues = new StringBuilder();
-//            System.out.println("Values for " + variable + ": " + env.getValues(variable).toString());
-            for (Boolean value : env.getValues(variable)) {
-//                System.out.println("Adding value " + value + " to string");
-                binaryValues.append(value ? "1" : "0");
-            }
-            System.out.println(binaryValues.toString() + " " + variable);
-        }
+        //runSimulator(ast.simulate.simulation.binary.length());
+        ast.runSimulator(env);
+        //printOutput();
     }
 }
 
@@ -117,7 +61,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        return new Start(visitHardware(ctx.hardware), visitInputs(ctx.inputs), visitOutputs(ctx.outputs), visitLatches(ctx.latches), visitUpdate(ctx.updates), visitSimulate(ctx.simulate));
+        return new Circuit(visitHardware(ctx.hardware), visitInputs(ctx.inputs), visitOutputs(ctx.outputs), visitLatches(ctx.latches), visitUpdate(ctx.updates), visitSimulate(ctx.simulate));
     }
 
     public Hardware visitHardware(Token hardware) {
