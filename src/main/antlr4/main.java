@@ -46,6 +46,7 @@ public class main {
 
         env = new Environment();
         runSimulator(ast.simulate.simulation.binary.length());
+        printOutput();
     }
 
     public static void initialize() {
@@ -64,9 +65,6 @@ public class main {
     }
 
     public static void nextCycle(int i) {
-        // Start next cycle in environment
-        env.nextCycle();
-
         // Input
         env.setVariable(ast.inputs.inputs.get(0), ast.simulate.simulation.binary.charAt(i) == '1');
 
@@ -84,7 +82,27 @@ public class main {
     public static void runSimulator(int n) {
         initialize();
         for (int i = 0; i < n; i++) {
+//            System.out.println("============== Running cycle: " + i + "/" + n + " ==============");
             nextCycle(i);
+            if (i+1 < n) {
+                // Start next cycle in environment
+                env.nextCycle();
+            }
+        }
+    }
+
+    public static void printOutput() {
+        ArrayList<String> variables = new ArrayList<>();
+        variables.addAll(ast.inputs.inputs);
+        variables.addAll(ast.outputs.outputs);
+        for (String variable : variables) {
+            StringBuilder binaryValues = new StringBuilder();
+//            System.out.println("Values for " + variable + ": " + env.getValues(variable).toString());
+            for (Boolean value : env.getValues(variable)) {
+//                System.out.println("Adding value " + value + " to string");
+                binaryValues.append(value ? "1" : "0");
+            }
+            System.out.println(binaryValues.toString() + " " + variable);
         }
     }
 }
