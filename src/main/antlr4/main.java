@@ -55,13 +55,18 @@ public class main {
         for (String output : ast.outputs.outputs) {
             env.setVariable(output, false);
         }
-
+        for (UpdateDeclaration update : ast.updates.updates) {
+            env.setVariable(update.id, false);
+        }
         for (LatchDeclaration latch : ast.latches.latches) {
             env.setVariable(latch.latchId, env.getVariable(latch.triggerId));
         }
     }
 
     public static void nextCycle(int i) {
+        // Start next cycle in environment
+        env.nextCycle();
+
         // Input
         env.setVariable(ast.inputs.inputs.get(0), ast.simulate.simulation.binary.charAt(i) == '1');
 
