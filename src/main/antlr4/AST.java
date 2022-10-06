@@ -25,6 +25,28 @@ class Start extends AST {
         this.updates = updates;
         this.simulate = simulate;
     }
+
+    public void eval(Environment env) {
+        initialize(env);
+        for (int i = 0; i < simulate.simulation.binary.length(); i++) {
+            nextCycle(env, i);
+        }
+    }
+
+    public void initialize(Environment env) {
+        inputs.eval(env);
+        outputs.eval(env);
+        latches.eval(env);
+    }
+
+    public void nextCycle(Environment env, int i) {
+        // Input
+        env.setVariable(inputs.inputs.get(0), simulate.simulation.binary.charAt(i) == '1');
+        // Update latches
+        latches.eval(env);
+        // Run updates
+        updates.eval(env);
+    }
 }
 
 
@@ -46,8 +68,11 @@ class Inputs extends AST {
         this.inputs = inputs;
     }
 
-//    public void eval(Environment env) {
-//    }
+    public void eval(Environment env) {
+        for (String input : inputs) {
+            env.setVariable(input, false);
+        }
+    }
 }
 
 class Outputs extends AST {
@@ -57,8 +82,11 @@ class Outputs extends AST {
         this.outputs = outputs;
     }
 
-//    public void eval(Environment env) {
-//    }
+    public void eval(Environment env) {
+        for (String output : outputs) {
+            env.setVariable(output, false);
+        }
+    }
 }
 
 class Latches extends AST {
@@ -68,8 +96,11 @@ class Latches extends AST {
         this.latches = latches;
     }
 
-//    public void eval(Environment env) {
-//    }
+    public void eval(Environment env) {
+        for (LatchDeclaration latch : latches) {
+            latch.eval(env);
+        }
+    }
 }
 
 class LatchDeclaration extends AST {
@@ -81,19 +112,13 @@ class LatchDeclaration extends AST {
         this.latchId = latchId;
     }
 
-//    @Override
-//    public void eval(Environment env) {
-//
-//    }
-
-
-    public void initialize(Environment env) {
-        env.setVariable(triggerId,false);
+    public void eval(Environment env) {
+        env.setVariable(latchId, env.getVariable(triggerId));
     }
 
-    public void nextCycle(Environment env, Boolean inputSignal) {
-        env.setVariable(triggerId, inputSignal);
-    }
+    //public void initialize(Environment env) {env.setVariable(triggerId,false);}
+
+    //public void nextCycle(Environment env, Boolean inputSignal) {env.setVariable(triggerId, inputSignal);}
 }
 
 class Updates extends AST {
@@ -103,8 +128,11 @@ class Updates extends AST {
         this.updates = updates;
     }
 
-//    public void eval(Environment env) {
-//    }
+    public void eval(Environment env) {
+        for (UpdateDeclaration update : updates) {
+            update.eval(env);
+        }
+    }
 }
 
 class UpdateDeclaration extends AST {

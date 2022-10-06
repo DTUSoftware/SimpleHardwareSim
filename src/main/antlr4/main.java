@@ -45,10 +45,12 @@ public class main {
 //        result.eval(new Environment());
 
         env = new Environment();
+
         runSimulator(ast.simulate.simulation.binary.length());
         printOutput();
     }
 
+    /*
     public static void initialize() {
         for (String input : ast.inputs.inputs) {
             env.setVariable(input, false);
@@ -105,6 +107,7 @@ public class main {
             System.out.println(binaryValues.toString() + " " + variable);
         }
     }
+     */
 }
 
 // We write an interpreter that implements interface
