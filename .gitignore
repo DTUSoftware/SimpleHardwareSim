@@ -1,10 +1,18 @@
 # Compiled class file
 *.class
 
+# Compiled ANTLR files
+*Listener.java
+*BaseListener.java
+*Parser.java
+*Lexer.java
+
 # Target folder
 target/
 
+# IDEA
 .idea/
+*.iml
 
 # Log file
 *.log

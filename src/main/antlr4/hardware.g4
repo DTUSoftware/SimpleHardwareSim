@@ -1,25 +1,45 @@
 grammar hardware;
 
-//Parser
-start   : '.hardware' IDENTIFIER 
-	'.inputs' IDENTIFIER+ 
-	'.outputs' IDENTIFIER+ 
-	('.latch' IDENTIFIER '->' IDENTIFIER)+
-	'.update' (IDENTIFIER '=' updateIdentifiers)+
-	'.simulate' IDENTIFIER '=' ('0'|'1')+    
-	EOF
-	;
+//==========[ Parser ]==========//
 
-//Variable
-updateIdentifiers: '(' updateIdentifiers ')'
-		| '!'? IDENTIFIER
-		| updateIdentifiers '&&' updateIdentifiers
-		| updateIdentifiers '||' updateIdentifiers
-		;
+start       :   '.hardware' hardware=IDENTIFIER
+                '.inputs'   inputs+=IDENTIFIER+
+                '.outputs'  outputs+=IDENTIFIER+
+                latches+=latchDecl+
+                '.update'   updates+=updateDecl+
+                '.simulate' simulate=simInput
+                EOF
+            ;
 
-//Lexer
-IDENTIFIER : [a-zA-Z_]+ ;
+latchDecl   :   '.latch' triggerID=IDENTIFIER '->' latchID=IDENTIFIER   # LatchDeclaration
+            ;
 
-HVIDRUM : [ \t\n]+ -> skip ;
-KOMMENTAR : '//' ~[\n]* -> skip ;
-MULTILINECOMMENTS :  '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip; 
+updateDecl  :   id=IDENTIFIER '=' exp=expr        # UpdateDeclaration
+            ;
+
+expr        :   '(' exp=expr ')'                  # Parentheses
+            |   '!' exp=expr                      # Negation
+            |   exp1=expr ('&&'|'and') exp2=expr  # And
+            |   exp1=expr ('||'|'or') exp2=expr   # Or
+            |   id=IDENTIFIER                     # Identifier
+            ;
+
+simInput    :   id=IDENTIFIER '=' binary=BINARY   # Simulation
+            ;
+
+//==========[ Lexer ]==========//
+
+IDENTIFIER  :   [a-zA-Z_] [a-zA-Z0-9_]*
+            ;
+
+BINARY      :   ('0'|'1')+
+            ;
+
+WHITESPACE  :   [ \t\n\r]+ -> skip
+            ;
+
+COMMENT     :   '//' ~[\n]* -> skip
+            ;
+
+COMMENTS    :   '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip
+            ;
