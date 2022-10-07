@@ -1,20 +1,21 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 class Environment {
-    private HashMap<String, ArrayList<Boolean>> variableValues = new HashMap<>();
+    private HashMap<String, Boolean[]> variableValues = new HashMap<>();
     private int currentCycle = 0;
+    private int simulationLength;
 
-    public Environment() {
+    public Environment(int simulationLength) {
+        this.simulationLength = simulationLength;
     }
 
     public void nextCycle() {
 //        System.out.println("Starting new environment cycle, current cycle: " + currentCycle);
         // Move up the old value to the new cycle
-        for (ArrayList<Boolean> value : variableValues.values()) {
-            value.add(value.get(currentCycle));
+        for (Boolean[] value : variableValues.values()) {
+            //value.add(value.get(currentCycle));
+            value[currentCycle+1]=(value[currentCycle]);
         }
         currentCycle++;
     }
@@ -23,28 +24,23 @@ class Environment {
 //        System.out.println("Setting " + name + " to " + value);
         if (variableValues.get(name) == null) {
 //            System.out.println("it is null, initializing");
-            variableValues.put(name, new ArrayList<>());
+            variableValues.put(name, new Boolean[simulationLength]);
         }
 //        System.out.println("Adding " + value + " as " + name + "'s " + currentCycle + " item");
 //        System.out.println("Before: " + variableValues.get(name).toString());
-        if (variableValues.get(name).size() <= currentCycle) {
-            variableValues.get(name).add(value);
-        }
-        else {
-            variableValues.get(name).set(currentCycle, value);
-        }
+          variableValues.get(name)[currentCycle] = value;
 //        System.out.println("After: " + variableValues.get(name).toString());
     }
 
     public Boolean getVariable(String name) {
         // If not defined yet
-        ArrayList<Boolean> value = variableValues.get(name);
+        Boolean[] value = variableValues.get(name);
         if (value == null) {
 //            System.err.println("Variable not defined, initializing to false: " + name);
             setVariable(name, false);
             value = variableValues.get(name); // update value
         }
-        Boolean boolValue = value.get(currentCycle);
+        Boolean boolValue = value[currentCycle];
         if (boolValue == null) {
             System.err.println("Variable not defined: " + name);
             System.exit(-1);
@@ -52,14 +48,14 @@ class Environment {
         return boolValue;
     }
 
-    public List<Boolean> getValues(String name) {
+    public Boolean[] getValues(String name) {
         return variableValues.get(name);
     }
 
     public String toString() {
         String table = "";
-        for (Map.Entry<String, ArrayList<Boolean>> entry : variableValues.entrySet()) {
-            table += entry.getKey() + "\t-> " + entry.getValue().get(currentCycle) + "\n";
+        for (Map.Entry<String, Boolean[]> entry : variableValues.entrySet()) {
+            table += entry.getKey() + "\t-> " + entry.getValue()[currentCycle] + "\n";
         }
         return table;
     }

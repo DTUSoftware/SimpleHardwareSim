@@ -251,9 +251,9 @@ class Identifier extends Expr {
 
 class Trace extends AST {
     String name;
-    List<Boolean> signal;
+    Boolean[] signal;
 
-    public Trace(String name, List<Boolean> signal) {
+    public Trace(String name, Boolean[] signal) {
         this.name = name;
         this.signal = signal;
     }

@@ -44,7 +44,7 @@ public class main {
         //System.out.println("The result is: "+
 //        result.eval(new Environment());
 
-        Environment env = new Environment();
+        Environment env = new Environment(ast.simulate.getSimulationLength());
 
         //runSimulator(ast.simulate.simulation.binary.length());
         ast.runSimulator(env);
