@@ -179,7 +179,6 @@ class Simulation extends AST {
 }
 
 abstract class Expr extends AST {
-
     abstract public Boolean eval(Environment env);
 }
 
@@ -242,6 +241,7 @@ class Identifier extends Expr {
 
     public Boolean eval(Environment env) {
         if (env.getVariable(id) == null) {
+            // If the variable doesn't exist, create it and initialize it to false
             System.out.println("Identifier not initialized to value, assuming " + id + "=0");
             env.setVariable(id, false); // set to false
             return env.getVariable(id);
