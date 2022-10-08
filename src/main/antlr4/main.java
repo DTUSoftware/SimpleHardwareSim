@@ -38,7 +38,7 @@ public class main {
         Circuit ast = (Circuit) interpreter.visit(parseTree);
 
         // Create the environment and run the simulator
-        Environment env = new Environment(ast.simulate.getSimulationLength());
+        Environment env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
         ast.runSimulator(env);
     }
 }

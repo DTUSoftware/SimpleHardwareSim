@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-class Environment {
+public class Environment {
     private HashMap<String, Boolean[]> variableValues = new HashMap<>();
     private int currentCycle = 0;
     private int simulationLength;
