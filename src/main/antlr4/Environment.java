@@ -15,7 +15,7 @@ class Environment {
         // Move up the old value to the new cycle
         for (Boolean[] value : variableValues.values()) {
             //value.add(value.get(currentCycle));
-            value[currentCycle+1]=(value[currentCycle]);
+            value[currentCycle + 1] = (value[currentCycle]);
         }
         currentCycle++;
     }
@@ -28,7 +28,7 @@ class Environment {
         }
 //        System.out.println("Adding " + value + " as " + name + "'s " + currentCycle + " item");
 //        System.out.println("Before: " + variableValues.get(name).toString());
-          variableValues.get(name)[currentCycle] = value;
+        variableValues.get(name)[currentCycle] = value;
 //        System.out.println("After: " + variableValues.get(name).toString());
     }
 

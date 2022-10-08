@@ -70,7 +70,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     public Inputs visitInputs(List<Token> inputs) {
         List<String> inputStrings = new ArrayList<>();
-        for (Token t: inputs) {
+        for (Token t : inputs) {
             inputStrings.add(t.getText());
         }
         return new Inputs(inputStrings);
@@ -78,7 +78,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     public Outputs visitOutputs(List<Token> outputs) {
         List<String> outputStrings = new ArrayList<>();
-        for (Token t: outputs) {
+        for (Token t : outputs) {
             outputStrings.add(t.getText());
         }
         return new Outputs(outputStrings);
@@ -86,7 +86,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     public Latches visitLatches(List<hardwareParser.LatchDeclContext> latches) {
         List<LatchDeclaration> latcheDecls = new ArrayList<>();
-        for (hardwareParser.LatchDeclContext t: latches) {
+        for (hardwareParser.LatchDeclContext t : latches) {
             latcheDecls.add((LatchDeclaration) visit(t));
         }
         return new Latches(latcheDecls);
@@ -94,7 +94,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
 
     public Updates visitUpdate(List<hardwareParser.UpdateDeclContext> updates) {
         List<UpdateDeclaration> updateDecls = new ArrayList<>();
-        for (hardwareParser.UpdateDeclContext t: updates) {
+        for (hardwareParser.UpdateDeclContext t : updates) {
             updateDecls.add((UpdateDeclaration) visit(t));
         }
         return new Updates(updateDecls);

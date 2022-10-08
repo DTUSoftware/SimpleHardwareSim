@@ -1,7 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AST {}
+public abstract class AST {
+}
 
 class Circuit extends AST {
     Hardware hardware;
@@ -25,7 +26,7 @@ class Circuit extends AST {
         initialize(env);
         for (int i = 0; i < n; i++) {
             nextCycle(env, i);
-            if (i+1 < n) {
+            if (i + 1 < n) {
                 // Start next cycle in environment
                 env.nextCycle();
             }
