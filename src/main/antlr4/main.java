@@ -45,6 +45,7 @@ public class main {
         // Create the environment and run the simulator
         env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
         ast.runSimulator(env);
+        ast.printOutput(env);
     }
 }
 

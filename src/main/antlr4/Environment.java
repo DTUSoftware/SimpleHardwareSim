@@ -24,6 +24,10 @@ public class Environment {
         currentCycle++;
     }
 
+    public HashMap<String, Boolean[]> getVariableValues() {
+        return variableValues;
+    }
+
     public int getSimulationLength() {
         return simulationLength;
     }

@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class AST {
@@ -45,28 +47,28 @@ class Circuit extends AST {
         return simulate;
     }
 
-    /**
-     * Tests whether an update's identifier changes by calling itself.
-     *
-     * @param env    the test environment
-     * @param update the update
-     * @param n      the amount of times to try calling itself
-     * @return <code>true</code> if it is NOT cyclic, else <code>false</code>
-     */
-    private boolean testUpdateCyclic(Environment env, UpdateDeclaration update, int n) {
-        Boolean beforeValue = env.getVariable(update.getID());
-        Boolean newValue;
-        boolean isCyclic = true;
-        for (int i = 0; i < n; i++) {
-            update.eval(env);
-            newValue = env.getVariable(update.getID());
-            if (beforeValue.equals(newValue)) {
-                isCyclic = false;
-            }
-            beforeValue = newValue;
-        }
-        return !isCyclic;
-    }
+//    /**
+//     * Tests whether an update's identifier changes by calling itself.
+//     *
+//     * @param env    the test environment
+//     * @param update the update
+//     * @param n      the amount of times to try calling itself
+//     * @return <code>true</code> if it is NOT cyclic, else <code>false</code>
+//     */
+//    private boolean testUpdateCyclic(Environment env, UpdateDeclaration update, int n) {
+//        Boolean beforeValue = env.getVariable(update.getID());
+//        Boolean newValue;
+//        boolean isCyclic = true;
+//        for (int i = 0; i < n; i++) {
+//            update.eval(env);
+//            newValue = env.getVariable(update.getID());
+//            if (beforeValue.equals(newValue)) {
+//                isCyclic = false;
+//            }
+//            beforeValue = newValue;
+//        }
+//        return !isCyclic;
+//    }
 
     /**
      * Runs tests, like cyclic tests.
@@ -74,45 +76,46 @@ class Circuit extends AST {
      * BRUTEFORCE TIME!
      *
      * @param env the Test Environment
-     * @return <code>true</code> if tests passed, <code>false</code> if not all tests passed.
      */
-    public boolean runTests(Environment env) {
-        String[] testSimulations = new String[]{"00000", "11111", "01010"};
+    public void runTests(Environment env) {
         String oldBinary = simulate.getSimulation().getBinary();
-        // For each update, try running the simulator to test "real data" for the cyclic updates
+        String[] testSimulations = new String[]{"00000", "11111", "01010"};
+        HashMap<String, Boolean[]>[] valueMaps = new HashMap[testSimulations.length];
+
+        // Try running the simulator to test "real data" for the cyclic updates
         // the alternative is to try out every possible combination, and uh, no thanks
+        for (int i = 0; i < testSimulations.length; i++) {
+            simulate.getSimulation().setBinary(testSimulations[i]);
+            resetEnvironment(env);
+            runSimulator(env);
+            valueMaps[i] = env.getVariableValues();
+        }
+
+        // Check if, in any of the simulations, the values got updated cyclic
         for (UpdateDeclaration update : updates.getUpdates()) {
-            for (String testSimulation : testSimulations) {
-                boolean failed = false;
-                simulate.getSimulation().setBinary(testSimulation);
-                resetEnvironment(env);
-                initialize(env);
-                for (int i = 0; i < env.getSimulationLength(); i++) {
-                    nextCycle(env, i);
-                    env.setVariable(update.getID(), false);
-                    if (!testUpdateCyclic(env, update, 5)) {
-                        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
-                        failed = true;
+            boolean cyclic = true;
+            for (HashMap<String, Boolean[]> valueMap : valueMaps) {
+                Boolean[] values = valueMap.get(update.getID());
+                Boolean beforeValue = null;
+                for (Boolean value : values) {
+                    if (value.equals(beforeValue)) {
+                        cyclic = false;
                         break;
                     }
+                    beforeValue = value;
                 }
-                if (failed) {
+                if (!cyclic) {
                     break;
                 }
-                resetEnvironment(env);
-                initialize(env);
-                for (int i = 0; i < env.getSimulationLength(); i++) {
-                    nextCycle(env, i);
-                    env.setVariable(update.getID(), true);
-                    if (!testUpdateCyclic(env, update, 5)) {
-                        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
-                        break;
-                    }
-                }
+            }
+            if (cyclic) {
+                System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
             }
         }
+
+//        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
+
         simulate.getSimulation().setBinary(oldBinary); // restore binary
-        return true;
     }
 
     public void runSimulator(Environment env) {
@@ -125,7 +128,6 @@ class Circuit extends AST {
                 env.nextCycle();
             }
         }
-        printOutput(env);
     }
 
     /**
