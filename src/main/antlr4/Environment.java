@@ -58,6 +58,7 @@ public class Environment {
      * Only used for testing, basically wipes the environment.
      */
     public void reset() {
+        setCurrentCycle(0);
         variableValues = new HashMap<>();
     }
 
