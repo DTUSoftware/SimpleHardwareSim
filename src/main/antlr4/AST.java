@@ -45,6 +45,76 @@ class Circuit extends AST {
         return simulate;
     }
 
+    /**
+     * Tests whether an update's identifier changes by calling itself.
+     *
+     * @param env    the test environment
+     * @param update the update
+     * @param n      the amount of times to try calling itself
+     * @return <code>true</code> if it is NOT cyclic, else <code>false</code>
+     */
+    private boolean testUpdateCyclic(Environment env, UpdateDeclaration update, int n) {
+        Boolean beforeValue = env.getVariable(update.getID());
+        Boolean newValue;
+        boolean isCyclic = true;
+        for (int i = 0; i < n; i++) {
+            update.eval(env);
+            newValue = env.getVariable(update.getID());
+            if (beforeValue.equals(newValue)) {
+                isCyclic = false;
+            }
+            beforeValue = newValue;
+        }
+        return !isCyclic;
+    }
+
+    /**
+     * Runs tests, like cyclic tests.
+     * This will take computing power, but not too much, I hope...
+     * BRUTEFORCE TIME!
+     *
+     * @param env the Test Environment
+     * @return <code>true</code> if tests passed, <code>false</code> if not all tests passed.
+     */
+    public boolean runTests(Environment env) {
+        String[] testSimulations = new String[]{"00000", "11111", "01010"};
+        String oldBinary = simulate.getSimulation().getBinary();
+        // For each update, try running the simulator to test "real data" for the cyclic updates
+        // the alternative is to try out every possible combination, and uh, no thanks
+        for (UpdateDeclaration update : updates.getUpdates()) {
+            for (String testSimulation : testSimulations) {
+                boolean failed = false;
+                simulate.getSimulation().setBinary(testSimulation);
+                resetEnvironment(env);
+                initialize(env);
+                for (int i = 0; i < env.getSimulationLength(); i++) {
+                    nextCycle(env, i);
+                    env.setVariable(update.getID(), false);
+                    if (!testUpdateCyclic(env, update, 5)) {
+                        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
+                        failed = true;
+                        break;
+                    }
+                }
+                if (failed) {
+                    break;
+                }
+                resetEnvironment(env);
+                initialize(env);
+                for (int i = 0; i < env.getSimulationLength(); i++) {
+                    nextCycle(env, i);
+                    env.setVariable(update.getID(), true);
+                    if (!testUpdateCyclic(env, update, 5)) {
+                        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
+                        break;
+                    }
+                }
+            }
+        }
+        simulate.getSimulation().setBinary(oldBinary); // restore binary
+        return true;
+    }
+
     public void runSimulator(Environment env) {
         int n = simulate.getSimulation().getBinaryLength();
         initialize(env);
@@ -56,6 +126,17 @@ class Circuit extends AST {
             }
         }
         printOutput(env);
+    }
+
+    /**
+     * Resets the environment.
+     * Is only used for testing.
+     *
+     * @param env the environment
+     */
+    private void resetEnvironment(Environment env) {
+        env.setSimulationLength(simulate.getSimulation().getBinaryLength());
+        env.reset();
     }
 
     public void initialize(Environment env) {
@@ -229,6 +310,16 @@ class Simulation extends AST {
         return id;
     }
 
+    /**
+     * Changes the binary.
+     * ONLY USED FOR TESTING, DO NOT USE IN PRODUCTION! REMEMBER TO REVERT VALUE!
+     *
+     * @param binary the new binary string
+     */
+    public void setBinary(String binary) {
+        this.binary = binary;
+    }
+
     public String getBinary() {
         return binary;
     }
@@ -239,7 +330,7 @@ class Simulation extends AST {
 }
 
 abstract class Expr extends AST {
-    abstract public Boolean eval(Environment env);
+    abstract public boolean eval(Environment env);
 }
 
 class Parentheses extends Expr {
@@ -249,7 +340,8 @@ class Parentheses extends Expr {
         this.expr = expr;
     }
 
-    public Boolean eval(Environment env) {
+    @Override
+    public boolean eval(Environment env) {
         return expr.eval(env);
     }
 }
@@ -261,7 +353,8 @@ class Negation extends Expr {
         this.expr = expr;
     }
 
-    public Boolean eval(Environment env) {
+    @Override
+    public boolean eval(Environment env) {
         return (!(expr.eval(env)));
     }
 }
@@ -274,7 +367,8 @@ class And extends Expr {
         this.expr2 = expr2;
     }
 
-    public Boolean eval(Environment env) {
+    @Override
+    public boolean eval(Environment env) {
         return expr1.eval(env) && expr2.eval(env);
     }
 }
@@ -287,7 +381,8 @@ class Or extends Expr {
         this.expr2 = expr2;
     }
 
-    public Boolean eval(Environment env) {
+    @Override
+    public boolean eval(Environment env) {
         return expr1.eval(env) || expr2.eval(env);
     }
 }
@@ -299,7 +394,8 @@ class Identifier extends Expr {
         this.id = id;
     }
 
-    public Boolean eval(Environment env) {
+    @Override
+    public boolean eval(Environment env) {
         if (env.getVariable(id) == null) {
             // If the variable doesn't exist, create it and initialize it to false
             System.out.println("Identifier not initialized to value, assuming " + id + "=0");

@@ -11,6 +11,12 @@ public class Environment {
     }
 
     public void nextCycle() {
+        // Check for breaking simulation length
+        if (currentCycle + 1 > simulationLength) {
+            System.out.println("[ERROR]: Environment exceeding simulation length!!!");
+            System.exit(0);
+        }
+
         // Move up the old value to the new cycle
         for (Boolean[] value : variableValues.values()) {
             value[currentCycle + 1] = (value[currentCycle]);
@@ -18,7 +24,44 @@ public class Environment {
         currentCycle++;
     }
 
-    public void setVariable(String name, Boolean value) {
+    public int getSimulationLength() {
+        return simulationLength;
+    }
+
+    /**
+     * Sets the simulation length.
+     * NOTE: If you change the simulation length, and you have arrays, you will HAVE TO
+     * regenerate them!
+     *
+     * @param simulationLength the length of the simulation (binary length)
+     */
+    public void setSimulationLength(int simulationLength) {
+        this.simulationLength = simulationLength;
+    }
+
+    public int getCurrentCycle() {
+        return currentCycle;
+    }
+
+    public void setCurrentCycle(int currentCycle) {
+        this.currentCycle = currentCycle;
+    }
+
+    public void resetVariable(String name) {
+        if (variableValues.get(name) != null) {
+            variableValues.put(name, null);
+        }
+    }
+
+    /**
+     * Resets the whole environment.
+     * Only used for testing, basically wipes the environment.
+     */
+    public void reset() {
+        variableValues = new HashMap<>();
+    }
+
+    public void setVariable(String name, boolean value) {
         if (variableValues.get(name) == null) {
             variableValues.put(name, new Boolean[simulationLength]);
         }
