@@ -27,3 +27,13 @@ grun:	hardwareLexer.class $(SOURCEDIR)/resources/03-trafiklys.hw
 
 test:	hardwareLexer.class main.class $(SOURCEDIR)/antlr4/hardware.g4 $(INPUTFILE)
 	cd $(TARGETDIR) && java main ../../../$(INPUTFILE)
+
+# Running specific examples #
+01:		hardwareLexer.class main.class $(SOURCEDIR)/antlr4/hardware.g4 $(SOURCEDIR)/resources/01-hello-world.hw
+	cd $(TARGETDIR) && java main ../../../$(SOURCEDIR)/resources/01-hello-world.hw
+
+02:		hardwareLexer.class main.class $(SOURCEDIR)/antlr4/hardware.g4 $(SOURCEDIR)/resources/02-trafiklys-minimal.hw
+	cd $(TARGETDIR) && java main ../../../$(SOURCEDIR)/resources/02-trafiklys-minimal.hw
+
+03:
+	make test
