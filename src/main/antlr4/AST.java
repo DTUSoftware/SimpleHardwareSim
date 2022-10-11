@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,8 +83,7 @@ class Circuit extends AST {
         for (Simulation simulate : simulations.getSimulations()) {
             if (size == null) {
                 size = simulate.getBinaryLength();
-            }
-            else if ((size - simulate.getBinaryLength()) != 0) {
+            } else if ((size - simulate.getBinaryLength()) != 0) {
                 System.out.println("[ERROR]: Size of inputs aren't equal!");
                 return false;
             }
@@ -323,22 +321,6 @@ class Simulations extends AST {
         for (Simulation simulate : simulations) {
             simulate.eval(env);
         }
-    }
-}
-
-class Simulate extends AST {
-    private Simulation simulation;
-
-    Simulate(Simulation simulation) {
-        this.simulation = simulation;
-    }
-
-    public Simulation getSimulation() {
-        return simulation;
-    }
-
-    public void eval(Environment env) {
-        simulation.eval(env);
     }
 }
 
