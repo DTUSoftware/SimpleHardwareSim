@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.CharStreams;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,14 @@ public class main {
         Interpreter interpreter = new Interpreter();
         Circuit ast = (Circuit) interpreter.visit(parseTree);
 
+        // Create a test environment and run tests, like cyclic tests
+        Environment env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
+        ast.runTests(env);
+
         // Create the environment and run the simulator
-        Environment env = new Environment(ast.simulate.getSimulationLength());
+        env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
         ast.runSimulator(env);
+        ast.printOutput(env);
     }
 }
 
