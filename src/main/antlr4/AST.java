@@ -80,6 +80,7 @@ class Circuit extends AST {
     public void runTests(Environment env) {
         String oldBinary = simulate.getSimulation().getBinary();
         String[] testSimulations = new String[]{"00000", "11111", "01010"};
+        @SuppressWarnings("unchecked")
         HashMap<String, Boolean[]>[] valueMaps = new HashMap[testSimulations.length];
 
         // Try running the simulator to test "real data" for the cyclic updates
