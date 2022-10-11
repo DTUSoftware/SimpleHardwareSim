@@ -38,14 +38,14 @@ public class main {
         Interpreter interpreter = new Interpreter();
         Circuit ast = (Circuit) interpreter.visit(parseTree);
 
-        // Create a test environment and run tests, like cyclic tests
-        Environment env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
-        ast.runTests(env);
-
-        // Create the environment and run the simulator
-        env = new Environment(ast.getSimulator().getSimulation().getBinaryLength());
-        ast.runSimulator(env);
-        ast.printOutput(env);
+        // Create a test environment and run tests, like cyclic tests - if they pass, run the simulator
+        Environment env = new Environment(ast.getSimulator().getSimulations().get(0).getBinaryLength());
+        if (ast.runTests(env)) {
+            // Create the environment and run the simulator
+            env = new Environment(ast.getSimulator().getSimulations().get(0).getBinaryLength());
+            ast.runSimulator(env);
+            ast.printOutput(env);
+        }
     }
 }
 
@@ -56,7 +56,7 @@ public class main {
 class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisitor<AST> {
     @Override
     public AST visitStart(hardwareParser.StartContext ctx) {
-        return new Circuit(visitHardware(ctx.hardware), visitInputs(ctx.inputs), visitOutputs(ctx.outputs), visitLatches(ctx.latches), visitUpdate(ctx.updates), visitSimulate(ctx.simulate));
+        return new Circuit(visitHardware(ctx.hardware), visitInputs(ctx.inputs), visitOutputs(ctx.outputs), visitLatches(ctx.latches), visitUpdate(ctx.updates), visitSimulator(ctx.simulate));
     }
 
     public Hardware visitHardware(Token hardware) {
@@ -95,8 +95,12 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hardwareVisit
         return new Updates(updateDecls);
     }
 
-    public Simulate visitSimulate(hardwareParser.SimInputContext simulate) {
-        return new Simulate((Simulation) visit(simulate));
+    public Simulations visitSimulator(List<hardwareParser.SimInputContext> simulate) {
+        List<Simulation> simulations = new ArrayList<>();
+        for (hardwareParser.SimInputContext t : simulate) {
+            simulations.add((Simulation) visit(t));
+        }
+        return new Simulations(simulations);
     }
 
     @Override

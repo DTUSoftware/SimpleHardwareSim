@@ -7,7 +7,7 @@ start       :   '.hardware' hardware=IDENTIFIER
                 '.outputs'  outputs+=IDENTIFIER+
                 latches+=latchDecl+
                 '.update'   updates+=updateDecl+
-                '.simulate' simulate=simInput
+                '.simulate' simulate+=simInput+
                 EOF
             ;
 

@@ -12,15 +12,15 @@ class Circuit extends AST {
     private Outputs outputs;
     private Latches latches;
     private Updates updates;
-    private Simulate simulate;
+    private Simulations simulations;
 
-    public Circuit(Hardware hardware, Inputs inputs, Outputs outputs, Latches latches, Updates updates, Simulate simulate) {
+    public Circuit(Hardware hardware, Inputs inputs, Outputs outputs, Latches latches, Updates updates, Simulations simulations) {
         this.hardware = hardware;
         this.inputs = inputs;
         this.outputs = outputs;
         this.latches = latches;
         this.updates = updates;
-        this.simulate = simulate;
+        this.simulations = simulations;
     }
 
     public Hardware getHardware() {
@@ -43,8 +43,8 @@ class Circuit extends AST {
         return updates;
     }
 
-    public Simulate getSimulator() {
-        return simulate;
+    public Simulations getSimulator() {
+        return simulations;
     }
 
 //    /**
@@ -76,20 +76,35 @@ class Circuit extends AST {
      * BRUTEFORCE TIME!
      *
      * @param env the Test Environment
+     * @return <code>true</code> if tests pass, else <code>false</code>.
      */
-    public void runTests(Environment env) {
-        String oldBinary = simulate.getSimulation().getBinary();
+    public boolean runTests(Environment env) {
+        ArrayList<String> oldBinaryStrings = new ArrayList<>();
+        Integer size = null;
+        for (Simulation simulate : simulations.getSimulations()) {
+            if (size == null) {
+                size = simulate.getBinaryLength();
+            }
+            else if ((size - simulate.getBinaryLength()) != 0) {
+                System.out.println("[ERROR]: Size of inputs aren't equal!");
+                return false;
+            }
+            oldBinaryStrings.add(simulate.getBinary());
+        }
+
         String[] testSimulations = new String[]{"00000", "11111", "01010"};
         @SuppressWarnings("unchecked")
-        HashMap<String, Boolean[]>[] valueMaps = new HashMap[testSimulations.length];
+        ArrayList<HashMap<String, Boolean[]>> valueMaps = new ArrayList<>();
 
         // Try running the simulator to test "real data" for the cyclic updates
         // the alternative is to try out every possible combination, and uh, no thanks
-        for (int i = 0; i < testSimulations.length; i++) {
-            simulate.getSimulation().setBinary(testSimulations[i]);
-            resetEnvironment(env);
-            runSimulator(env);
-            valueMaps[i] = env.getVariableValues();
+        for (Simulation simulate : simulations.getSimulations()) {
+            for (String testSimulation : testSimulations) {
+                simulate.setBinary(testSimulation);
+                resetEnvironment(env);
+                runSimulator(env);
+                valueMaps.add(env.getVariableValues());
+            }
         }
 
         // Check if, in any of the simulations, the values got updated cyclic
@@ -116,11 +131,16 @@ class Circuit extends AST {
 
 //        System.out.println("[WARN]: Cyclic test for updateDecl with id = " + update.getID() + " failed! Please check input for cyclic updates!");
 
-        simulate.getSimulation().setBinary(oldBinary); // restore binary
+        // restore binary
+        List<Simulation> simulates = simulations.getSimulations();
+        for (int i = 0; i < simulates.size(); i++) {
+            simulates.get(i).setBinary(oldBinaryStrings.get(i));
+        }
+        return true;
     }
 
     public void runSimulator(Environment env) {
-        int n = simulate.getSimulation().getBinaryLength();
+        int n = env.getSimulationLength();
         initialize(env);
         for (int i = 0; i < n; i++) {
             nextCycle(env, i);
@@ -138,7 +158,7 @@ class Circuit extends AST {
      * @param env the environment
      */
     private void resetEnvironment(Environment env) {
-        env.setSimulationLength(simulate.getSimulation().getBinaryLength());
+        env.setSimulationLength(simulations.getSimulations().get(0).getBinaryLength());
         env.reset();
     }
 
@@ -152,8 +172,8 @@ class Circuit extends AST {
     }
 
     public void nextCycle(Environment env, int i) {
-        // Input
-        env.setVariable(inputs.getInputs().get(0), simulate.getSimulation().getBinary().charAt(i) == '1');
+        // Input/Simulations
+        simulations.eval(env);
         // Update latches
         latches.eval(env);
         // Run updates
@@ -288,6 +308,24 @@ class UpdateDeclaration extends AST {
     }
 }
 
+class Simulations extends AST {
+    private List<Simulation> simulations;
+
+    Simulations(List<Simulation> simulations) {
+        this.simulations = simulations;
+    }
+
+    public List<Simulation> getSimulations() {
+        return simulations;
+    }
+
+    public void eval(Environment env) {
+        for (Simulation simulate : simulations) {
+            simulate.eval(env);
+        }
+    }
+}
+
 class Simulate extends AST {
     private Simulation simulation;
 
@@ -297,6 +335,10 @@ class Simulate extends AST {
 
     public Simulation getSimulation() {
         return simulation;
+    }
+
+    public void eval(Environment env) {
+        simulation.eval(env);
     }
 }
 
@@ -329,6 +371,10 @@ class Simulation extends AST {
 
     public int getBinaryLength() {
         return binary.length();
+    }
+
+    public void eval(Environment env) {
+        env.setVariable(id, binary.charAt(env.getCurrentCycle()) == '1');
     }
 }
 
